@@ -1,0 +1,6 @@
+# environment
+.env
+secrets.yml
+
+# builds
+build/
