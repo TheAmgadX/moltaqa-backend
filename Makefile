@@ -1,6 +1,6 @@
-# used to generate proto buffers
+# used to generate grpc code.
 PROTO_DIR := proto
-PROTO_SRC := $(wildcard $(PROTO_DIR)/*.proto)
+PROTO_SRC := $(shell find $(PROTO_DIR) -name "*.proto")
 GO_OUT := .
 
 .PHONY: generate-proto
