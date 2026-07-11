@@ -1,12 +1,15 @@
 # used to generate grpc code.
+# to run the code: make generate-proto DIR=proto/sub-dir
 PROTO_DIR := proto
-PROTO_SRC := $(shell find $(PROTO_DIR) -name "*.proto")
 GO_OUT := .
 
 .PHONY: generate-proto
+
 generate-proto:
+	@test -n "$(DIR)" || (echo "Usage: make generate-proto DIR=proto/user"; exit 1)
+
 	protoc \
-		--proto_path=$(PROTO_DIR) \
+		-I=$(PROTO_DIR) \
 		--go_out=$(GO_OUT) \
 		--go-grpc_out=$(GO_OUT) \
-		$(PROTO_SRC)
+		$(shell find $(DIR) -type f -name "*.proto")

@@ -109,9 +109,7 @@ message PrivacySettings {
 
     bool read_receipts_enabled = 5;
 
-    Visibility discover_by_phone = 6;
-
-    Visibility allow_messages_by_username = 7;
+    bool find_by_username = 6;
 }
 
 message CreateUserRequest {
@@ -265,9 +263,9 @@ message UpdatePrivacySettingsRequest {
 
     google.protobuf.Int32Value last_seen_visibility = 5;
 
-    google.protobuf.Int32Value discover_by_phone = 6;
+    bool read_receipts_enabled = 6;
 
-    google.protobuf.Int32Value allow_messages_by_username = 7;
+    bool find_by_username = 7;
 }
 
 message UpdatePrivacySettingsResponse {

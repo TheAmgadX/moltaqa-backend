@@ -352,16 +352,15 @@ func (x *UserSummary) GetAccountBadge() AccountBadge {
 }
 
 type PrivacySettings struct {
-	state                   protoimpl.MessageState `protogen:"open.v1"`
-	AvatarVisibility        Visibility             `protobuf:"varint,1,opt,name=avatar_visibility,json=avatarVisibility,proto3,enum=users.Visibility" json:"avatar_visibility,omitempty"`
-	PhoneVisibility         Visibility             `protobuf:"varint,2,opt,name=phone_visibility,json=phoneVisibility,proto3,enum=users.Visibility" json:"phone_visibility,omitempty"`
-	EmailVisibility         Visibility             `protobuf:"varint,3,opt,name=email_visibility,json=emailVisibility,proto3,enum=users.Visibility" json:"email_visibility,omitempty"`
-	LastSeenVisibility      Visibility             `protobuf:"varint,4,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3,enum=users.Visibility" json:"last_seen_visibility,omitempty"`
-	ReadReceiptsEnabled     bool                   `protobuf:"varint,5,opt,name=read_receipts_enabled,json=readReceiptsEnabled,proto3" json:"read_receipts_enabled,omitempty"`
-	DiscoverByPhone         Visibility             `protobuf:"varint,6,opt,name=discover_by_phone,json=discoverByPhone,proto3,enum=users.Visibility" json:"discover_by_phone,omitempty"`
-	AllowMessagesByUsername Visibility             `protobuf:"varint,7,opt,name=allow_messages_by_username,json=allowMessagesByUsername,proto3,enum=users.Visibility" json:"allow_messages_by_username,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	AvatarVisibility    Visibility             `protobuf:"varint,1,opt,name=avatar_visibility,json=avatarVisibility,proto3,enum=users.Visibility" json:"avatar_visibility,omitempty"`
+	PhoneVisibility     Visibility             `protobuf:"varint,2,opt,name=phone_visibility,json=phoneVisibility,proto3,enum=users.Visibility" json:"phone_visibility,omitempty"`
+	EmailVisibility     Visibility             `protobuf:"varint,3,opt,name=email_visibility,json=emailVisibility,proto3,enum=users.Visibility" json:"email_visibility,omitempty"`
+	LastSeenVisibility  Visibility             `protobuf:"varint,4,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3,enum=users.Visibility" json:"last_seen_visibility,omitempty"`
+	ReadReceiptsEnabled bool                   `protobuf:"varint,5,opt,name=read_receipts_enabled,json=readReceiptsEnabled,proto3" json:"read_receipts_enabled,omitempty"`
+	FindByUsername      bool                   `protobuf:"varint,6,opt,name=find_by_username,json=findByUsername,proto3" json:"find_by_username,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *PrivacySettings) Reset() {
@@ -429,18 +428,11 @@ func (x *PrivacySettings) GetReadReceiptsEnabled() bool {
 	return false
 }
 
-func (x *PrivacySettings) GetDiscoverByPhone() Visibility {
+func (x *PrivacySettings) GetFindByUsername() bool {
 	if x != nil {
-		return x.DiscoverByPhone
+		return x.FindByUsername
 	}
-	return Visibility_EVERYONE
-}
-
-func (x *PrivacySettings) GetAllowMessagesByUsername() Visibility {
-	if x != nil {
-		return x.AllowMessagesByUsername
-	}
-	return Visibility_EVERYONE
+	return false
 }
 
 type CreateUserRequest struct {
@@ -1724,16 +1716,16 @@ func (x *GetPrivacySettingsResponse) GetSettings() *PrivacySettings {
 }
 
 type UpdatePrivacySettingsRequest struct {
-	state                   protoimpl.MessageState `protogen:"open.v1"`
-	UserId                  string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AvatarVisibility        *wrapperspb.Int32Value `protobuf:"bytes,2,opt,name=avatar_visibility,json=avatarVisibility,proto3" json:"avatar_visibility,omitempty"`
-	PhoneVisibility         *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=phone_visibility,json=phoneVisibility,proto3" json:"phone_visibility,omitempty"`
-	EmailVisibility         *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=email_visibility,json=emailVisibility,proto3" json:"email_visibility,omitempty"`
-	LastSeenVisibility      *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3" json:"last_seen_visibility,omitempty"`
-	DiscoverByPhone         *wrapperspb.Int32Value `protobuf:"bytes,6,opt,name=discover_by_phone,json=discoverByPhone,proto3" json:"discover_by_phone,omitempty"`
-	AllowMessagesByUsername *wrapperspb.Int32Value `protobuf:"bytes,7,opt,name=allow_messages_by_username,json=allowMessagesByUsername,proto3" json:"allow_messages_by_username,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	UserId              string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AvatarVisibility    *wrapperspb.Int32Value `protobuf:"bytes,2,opt,name=avatar_visibility,json=avatarVisibility,proto3" json:"avatar_visibility,omitempty"`
+	PhoneVisibility     *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=phone_visibility,json=phoneVisibility,proto3" json:"phone_visibility,omitempty"`
+	EmailVisibility     *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=email_visibility,json=emailVisibility,proto3" json:"email_visibility,omitempty"`
+	LastSeenVisibility  *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3" json:"last_seen_visibility,omitempty"`
+	ReadReceiptsEnabled bool                   `protobuf:"varint,6,opt,name=read_receipts_enabled,json=readReceiptsEnabled,proto3" json:"read_receipts_enabled,omitempty"`
+	FindByUsername      bool                   `protobuf:"varint,7,opt,name=find_by_username,json=findByUsername,proto3" json:"find_by_username,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *UpdatePrivacySettingsRequest) Reset() {
@@ -1801,18 +1793,18 @@ func (x *UpdatePrivacySettingsRequest) GetLastSeenVisibility() *wrapperspb.Int32
 	return nil
 }
 
-func (x *UpdatePrivacySettingsRequest) GetDiscoverByPhone() *wrapperspb.Int32Value {
+func (x *UpdatePrivacySettingsRequest) GetReadReceiptsEnabled() bool {
 	if x != nil {
-		return x.DiscoverByPhone
+		return x.ReadReceiptsEnabled
 	}
-	return nil
+	return false
 }
 
-func (x *UpdatePrivacySettingsRequest) GetAllowMessagesByUsername() *wrapperspb.Int32Value {
+func (x *UpdatePrivacySettingsRequest) GetFindByUsername() bool {
 	if x != nil {
-		return x.AllowMessagesByUsername
+		return x.FindByUsername
 	}
-	return nil
+	return false
 }
 
 type UpdatePrivacySettingsResponse struct {
@@ -1889,15 +1881,14 @@ const file_user_users_proto_rawDesc = "" +
 	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
 	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12*\n" +
 	"\x11profile_image_url\x18\x04 \x01(\tR\x0fprofileImageUrl\x128\n" +
-	"\raccount_badge\x18\x05 \x01(\x0e2\x13.users.AccountBadgeR\faccountBadge\"\xd5\x03\n" +
+	"\raccount_badge\x18\x05 \x01(\x0e2\x13.users.AccountBadgeR\faccountBadge\"\xf0\x02\n" +
 	"\x0fPrivacySettings\x12>\n" +
 	"\x11avatar_visibility\x18\x01 \x01(\x0e2\x11.users.VisibilityR\x10avatarVisibility\x12<\n" +
 	"\x10phone_visibility\x18\x02 \x01(\x0e2\x11.users.VisibilityR\x0fphoneVisibility\x12<\n" +
 	"\x10email_visibility\x18\x03 \x01(\x0e2\x11.users.VisibilityR\x0femailVisibility\x12C\n" +
 	"\x14last_seen_visibility\x18\x04 \x01(\x0e2\x11.users.VisibilityR\x12lastSeenVisibility\x122\n" +
-	"\x15read_receipts_enabled\x18\x05 \x01(\bR\x13readReceiptsEnabled\x12=\n" +
-	"\x11discover_by_phone\x18\x06 \x01(\x0e2\x11.users.VisibilityR\x0fdiscoverByPhone\x12N\n" +
-	"\x1aallow_messages_by_username\x18\a \x01(\x0e2\x11.users.VisibilityR\x17allowMessagesByUsername\"\x8e\x01\n" +
+	"\x15read_receipts_enabled\x18\x05 \x01(\bR\x13readReceiptsEnabled\x12(\n" +
+	"\x10find_by_username\x18\x06 \x01(\bR\x0efindByUsername\"\x8e\x01\n" +
 	"\x11CreateUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -1969,15 +1960,15 @@ const file_user_users_proto_rawDesc = "" +
 	"\x19GetPrivacySettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"P\n" +
 	"\x1aGetPrivacySettingsResponse\x122\n" +
-	"\bsettings\x18\x01 \x01(\v2\x16.users.PrivacySettingsR\bsettings\"\x83\x04\n" +
+	"\bsettings\x18\x01 \x01(\v2\x16.users.PrivacySettingsR\bsettings\"\xbe\x03\n" +
 	"\x1cUpdatePrivacySettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12H\n" +
 	"\x11avatar_visibility\x18\x02 \x01(\v2\x1b.google.protobuf.Int32ValueR\x10avatarVisibility\x12F\n" +
 	"\x10phone_visibility\x18\x03 \x01(\v2\x1b.google.protobuf.Int32ValueR\x0fphoneVisibility\x12F\n" +
 	"\x10email_visibility\x18\x04 \x01(\v2\x1b.google.protobuf.Int32ValueR\x0femailVisibility\x12M\n" +
-	"\x14last_seen_visibility\x18\x05 \x01(\v2\x1b.google.protobuf.Int32ValueR\x12lastSeenVisibility\x12G\n" +
-	"\x11discover_by_phone\x18\x06 \x01(\v2\x1b.google.protobuf.Int32ValueR\x0fdiscoverByPhone\x12X\n" +
-	"\x1aallow_messages_by_username\x18\a \x01(\v2\x1b.google.protobuf.Int32ValueR\x17allowMessagesByUsername\"S\n" +
+	"\x14last_seen_visibility\x18\x05 \x01(\v2\x1b.google.protobuf.Int32ValueR\x12lastSeenVisibility\x122\n" +
+	"\x15read_receipts_enabled\x18\x06 \x01(\bR\x13readReceiptsEnabled\x12(\n" +
+	"\x10find_by_username\x18\a \x01(\bR\x0efindByUsername\"S\n" +
 	"\x1dUpdatePrivacySettingsResponse\x122\n" +
 	"\bsettings\x18\x01 \x01(\v2\x16.users.PrivacySettingsR\bsettings*A\n" +
 	"\n" +
@@ -2073,61 +2064,57 @@ var file_user_users_proto_depIdxs = []int32{
 	0,  // 6: users.PrivacySettings.phone_visibility:type_name -> users.Visibility
 	0,  // 7: users.PrivacySettings.email_visibility:type_name -> users.Visibility
 	0,  // 8: users.PrivacySettings.last_seen_visibility:type_name -> users.Visibility
-	0,  // 9: users.PrivacySettings.discover_by_phone:type_name -> users.Visibility
-	0,  // 10: users.PrivacySettings.allow_messages_by_username:type_name -> users.Visibility
-	2,  // 11: users.CreateUserResponse.user:type_name -> users.User
-	31, // 12: users.UpdateUserRequest.username:type_name -> google.protobuf.StringValue
-	31, // 13: users.UpdateUserRequest.display_name:type_name -> google.protobuf.StringValue
-	31, // 14: users.UpdateUserRequest.email:type_name -> google.protobuf.StringValue
-	31, // 15: users.UpdateUserRequest.phone:type_name -> google.protobuf.StringValue
-	31, // 16: users.UpdateUserRequest.profile_image_url:type_name -> google.protobuf.StringValue
-	31, // 17: users.UpdateUserRequest.bio:type_name -> google.protobuf.StringValue
-	31, // 18: users.UpdateUserRequest.bio_status:type_name -> google.protobuf.StringValue
-	30, // 19: users.UpdateUserRequest.birth_date:type_name -> google.protobuf.Timestamp
-	2,  // 20: users.UpdateUserResponse.user:type_name -> users.User
-	2,  // 21: users.GetUserResponse.user:type_name -> users.User
-	2,  // 22: users.GetUsersResponse.users:type_name -> users.User
-	3,  // 23: users.GetUserSummaryResponse.user:type_name -> users.UserSummary
-	3,  // 24: users.GetUsersSummaryResponse.users:type_name -> users.UserSummary
-	3,  // 25: users.SearchUsersResponse.users:type_name -> users.UserSummary
-	24, // 26: users.UsersExistResponse.users:type_name -> users.UserExistence
-	4,  // 27: users.GetPrivacySettingsResponse.settings:type_name -> users.PrivacySettings
-	32, // 28: users.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> google.protobuf.Int32Value
-	32, // 29: users.UpdatePrivacySettingsRequest.phone_visibility:type_name -> google.protobuf.Int32Value
-	32, // 30: users.UpdatePrivacySettingsRequest.email_visibility:type_name -> google.protobuf.Int32Value
-	32, // 31: users.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> google.protobuf.Int32Value
-	32, // 32: users.UpdatePrivacySettingsRequest.discover_by_phone:type_name -> google.protobuf.Int32Value
-	32, // 33: users.UpdatePrivacySettingsRequest.allow_messages_by_username:type_name -> google.protobuf.Int32Value
-	4,  // 34: users.UpdatePrivacySettingsResponse.settings:type_name -> users.PrivacySettings
-	5,  // 35: users.UsersService.CreateUser:input_type -> users.CreateUserRequest
-	7,  // 36: users.UsersService.UpdateUser:input_type -> users.UpdateUserRequest
-	9,  // 37: users.UsersService.DeleteUser:input_type -> users.DeleteUserRequest
-	11, // 38: users.UsersService.GetUser:input_type -> users.GetUserRequest
-	13, // 39: users.UsersService.GetUsers:input_type -> users.GetUsersRequest
-	15, // 40: users.UsersService.GetUserSummary:input_type -> users.GetUserSummaryRequest
-	17, // 41: users.UsersService.GetUsersSummary:input_type -> users.GetUsersSummaryRequest
-	19, // 42: users.UsersService.SearchUsers:input_type -> users.SearchUsersRequest
-	21, // 43: users.UsersService.UserExists:input_type -> users.UserExistsRequest
-	23, // 44: users.UsersService.UsersExist:input_type -> users.UsersExistRequest
-	26, // 45: users.UsersService.GetPrivacySettings:input_type -> users.GetPrivacySettingsRequest
-	28, // 46: users.UsersService.UpdatePrivacySettings:input_type -> users.UpdatePrivacySettingsRequest
-	6,  // 47: users.UsersService.CreateUser:output_type -> users.CreateUserResponse
-	8,  // 48: users.UsersService.UpdateUser:output_type -> users.UpdateUserResponse
-	10, // 49: users.UsersService.DeleteUser:output_type -> users.DeleteUserResponse
-	12, // 50: users.UsersService.GetUser:output_type -> users.GetUserResponse
-	14, // 51: users.UsersService.GetUsers:output_type -> users.GetUsersResponse
-	16, // 52: users.UsersService.GetUserSummary:output_type -> users.GetUserSummaryResponse
-	18, // 53: users.UsersService.GetUsersSummary:output_type -> users.GetUsersSummaryResponse
-	20, // 54: users.UsersService.SearchUsers:output_type -> users.SearchUsersResponse
-	22, // 55: users.UsersService.UserExists:output_type -> users.UserExistsResponse
-	25, // 56: users.UsersService.UsersExist:output_type -> users.UsersExistResponse
-	27, // 57: users.UsersService.GetPrivacySettings:output_type -> users.GetPrivacySettingsResponse
-	29, // 58: users.UsersService.UpdatePrivacySettings:output_type -> users.UpdatePrivacySettingsResponse
-	47, // [47:59] is the sub-list for method output_type
-	35, // [35:47] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	2,  // 9: users.CreateUserResponse.user:type_name -> users.User
+	31, // 10: users.UpdateUserRequest.username:type_name -> google.protobuf.StringValue
+	31, // 11: users.UpdateUserRequest.display_name:type_name -> google.protobuf.StringValue
+	31, // 12: users.UpdateUserRequest.email:type_name -> google.protobuf.StringValue
+	31, // 13: users.UpdateUserRequest.phone:type_name -> google.protobuf.StringValue
+	31, // 14: users.UpdateUserRequest.profile_image_url:type_name -> google.protobuf.StringValue
+	31, // 15: users.UpdateUserRequest.bio:type_name -> google.protobuf.StringValue
+	31, // 16: users.UpdateUserRequest.bio_status:type_name -> google.protobuf.StringValue
+	30, // 17: users.UpdateUserRequest.birth_date:type_name -> google.protobuf.Timestamp
+	2,  // 18: users.UpdateUserResponse.user:type_name -> users.User
+	2,  // 19: users.GetUserResponse.user:type_name -> users.User
+	2,  // 20: users.GetUsersResponse.users:type_name -> users.User
+	3,  // 21: users.GetUserSummaryResponse.user:type_name -> users.UserSummary
+	3,  // 22: users.GetUsersSummaryResponse.users:type_name -> users.UserSummary
+	3,  // 23: users.SearchUsersResponse.users:type_name -> users.UserSummary
+	24, // 24: users.UsersExistResponse.users:type_name -> users.UserExistence
+	4,  // 25: users.GetPrivacySettingsResponse.settings:type_name -> users.PrivacySettings
+	32, // 26: users.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> google.protobuf.Int32Value
+	32, // 27: users.UpdatePrivacySettingsRequest.phone_visibility:type_name -> google.protobuf.Int32Value
+	32, // 28: users.UpdatePrivacySettingsRequest.email_visibility:type_name -> google.protobuf.Int32Value
+	32, // 29: users.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> google.protobuf.Int32Value
+	4,  // 30: users.UpdatePrivacySettingsResponse.settings:type_name -> users.PrivacySettings
+	5,  // 31: users.UsersService.CreateUser:input_type -> users.CreateUserRequest
+	7,  // 32: users.UsersService.UpdateUser:input_type -> users.UpdateUserRequest
+	9,  // 33: users.UsersService.DeleteUser:input_type -> users.DeleteUserRequest
+	11, // 34: users.UsersService.GetUser:input_type -> users.GetUserRequest
+	13, // 35: users.UsersService.GetUsers:input_type -> users.GetUsersRequest
+	15, // 36: users.UsersService.GetUserSummary:input_type -> users.GetUserSummaryRequest
+	17, // 37: users.UsersService.GetUsersSummary:input_type -> users.GetUsersSummaryRequest
+	19, // 38: users.UsersService.SearchUsers:input_type -> users.SearchUsersRequest
+	21, // 39: users.UsersService.UserExists:input_type -> users.UserExistsRequest
+	23, // 40: users.UsersService.UsersExist:input_type -> users.UsersExistRequest
+	26, // 41: users.UsersService.GetPrivacySettings:input_type -> users.GetPrivacySettingsRequest
+	28, // 42: users.UsersService.UpdatePrivacySettings:input_type -> users.UpdatePrivacySettingsRequest
+	6,  // 43: users.UsersService.CreateUser:output_type -> users.CreateUserResponse
+	8,  // 44: users.UsersService.UpdateUser:output_type -> users.UpdateUserResponse
+	10, // 45: users.UsersService.DeleteUser:output_type -> users.DeleteUserResponse
+	12, // 46: users.UsersService.GetUser:output_type -> users.GetUserResponse
+	14, // 47: users.UsersService.GetUsers:output_type -> users.GetUsersResponse
+	16, // 48: users.UsersService.GetUserSummary:output_type -> users.GetUserSummaryResponse
+	18, // 49: users.UsersService.GetUsersSummary:output_type -> users.GetUsersSummaryResponse
+	20, // 50: users.UsersService.SearchUsers:output_type -> users.SearchUsersResponse
+	22, // 51: users.UsersService.UserExists:output_type -> users.UserExistsResponse
+	25, // 52: users.UsersService.UsersExist:output_type -> users.UsersExistResponse
+	27, // 53: users.UsersService.GetPrivacySettings:output_type -> users.GetPrivacySettingsResponse
+	29, // 54: users.UsersService.UpdatePrivacySettings:output_type -> users.UpdatePrivacySettingsResponse
+	43, // [43:55] is the sub-list for method output_type
+	31, // [31:43] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_user_users_proto_init() }
