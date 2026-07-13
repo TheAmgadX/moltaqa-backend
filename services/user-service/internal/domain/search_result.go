@@ -1,6 +1,6 @@
 package domain
 
 type UserSearchResult struct {
-	Users        []UserSummary
-	TotalResults uint32
+	Users   []UserSummary
+	HasMore bool
 }

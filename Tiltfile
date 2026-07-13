@@ -14,3 +14,16 @@ docker_build(
 k8s_resource("api-gateway", port_forwards='8080:8080')
 
 # ---------- api-gateway end ----------
+
+# ---------- user-service start ----------
+
+k8s_yaml("services/user-service/deployments/k8s/user-service.yml")
+docker_build(
+    "user-service",
+    ".",
+    dockerfile="services/user-service/deployments/docker/Dockerfile",
+)
+
+k8s_resource("user-service", port_forwards='50051:50051')
+
+# ---------- user-service end ----------

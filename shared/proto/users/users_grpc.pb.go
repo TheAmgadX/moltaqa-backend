@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v7.35.1
-// source: user/users.proto
+// source: users/v1/users.proto
 
 package users
 
@@ -19,18 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UsersService_CreateUser_FullMethodName            = "/users.UsersService/CreateUser"
-	UsersService_UpdateUser_FullMethodName            = "/users.UsersService/UpdateUser"
-	UsersService_DeleteUser_FullMethodName            = "/users.UsersService/DeleteUser"
-	UsersService_GetUser_FullMethodName               = "/users.UsersService/GetUser"
-	UsersService_GetUsers_FullMethodName              = "/users.UsersService/GetUsers"
-	UsersService_GetUserSummary_FullMethodName        = "/users.UsersService/GetUserSummary"
-	UsersService_GetUsersSummary_FullMethodName       = "/users.UsersService/GetUsersSummary"
-	UsersService_SearchUsers_FullMethodName           = "/users.UsersService/SearchUsers"
-	UsersService_UserExists_FullMethodName            = "/users.UsersService/UserExists"
-	UsersService_UsersExist_FullMethodName            = "/users.UsersService/UsersExist"
-	UsersService_GetPrivacySettings_FullMethodName    = "/users.UsersService/GetPrivacySettings"
-	UsersService_UpdatePrivacySettings_FullMethodName = "/users.UsersService/UpdatePrivacySettings"
+	UsersService_CreateUser_FullMethodName            = "/users.v1.UsersService/CreateUser"
+	UsersService_UpdateUser_FullMethodName            = "/users.v1.UsersService/UpdateUser"
+	UsersService_DeleteUser_FullMethodName            = "/users.v1.UsersService/DeleteUser"
+	UsersService_RestoreUser_FullMethodName           = "/users.v1.UsersService/RestoreUser"
+	UsersService_GetUser_FullMethodName               = "/users.v1.UsersService/GetUser"
+	UsersService_GetUsers_FullMethodName              = "/users.v1.UsersService/GetUsers"
+	UsersService_GetUserSummary_FullMethodName        = "/users.v1.UsersService/GetUserSummary"
+	UsersService_GetUsersSummary_FullMethodName       = "/users.v1.UsersService/GetUsersSummary"
+	UsersService_SearchUsers_FullMethodName           = "/users.v1.UsersService/SearchUsers"
+	UsersService_UserExists_FullMethodName            = "/users.v1.UsersService/UserExists"
+	UsersService_UsersExist_FullMethodName            = "/users.v1.UsersService/UsersExist"
+	UsersService_GetPrivacySettings_FullMethodName    = "/users.v1.UsersService/GetPrivacySettings"
+	UsersService_UpdatePrivacySettings_FullMethodName = "/users.v1.UsersService/UpdatePrivacySettings"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -40,6 +41,7 @@ type UsersServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	RestoreUser(ctx context.Context, in *RestoreUserRequest, opts ...grpc.CallOption) (*RestoreUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	GetUsers(ctx context.Context, in *GetUsersRequest, opts ...grpc.CallOption) (*GetUsersResponse, error)
 	GetUserSummary(ctx context.Context, in *GetUserSummaryRequest, opts ...grpc.CallOption) (*GetUserSummaryResponse, error)
@@ -83,6 +85,16 @@ func (c *usersServiceClient) DeleteUser(ctx context.Context, in *DeleteUserReque
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteUserResponse)
 	err := c.cc.Invoke(ctx, UsersService_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) RestoreUser(ctx context.Context, in *RestoreUserRequest, opts ...grpc.CallOption) (*RestoreUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestoreUserResponse)
+	err := c.cc.Invoke(ctx, UsersService_RestoreUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -186,6 +198,7 @@ type UsersServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	RestoreUser(context.Context, *RestoreUserRequest) (*RestoreUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	GetUsers(context.Context, *GetUsersRequest) (*GetUsersResponse, error)
 	GetUserSummary(context.Context, *GetUserSummaryRequest) (*GetUserSummaryResponse, error)
@@ -213,6 +226,9 @@ func (UnimplementedUsersServiceServer) UpdateUser(context.Context, *UpdateUserRe
 }
 func (UnimplementedUsersServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUsersServiceServer) RestoreUser(context.Context, *RestoreUserRequest) (*RestoreUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestoreUser not implemented")
 }
 func (UnimplementedUsersServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
@@ -312,6 +328,24 @@ func _UsersService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UsersServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_RestoreUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RestoreUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).RestoreUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_RestoreUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).RestoreUser(ctx, req.(*RestoreUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -482,7 +516,7 @@ func _UsersService_UpdatePrivacySettings_Handler(srv interface{}, ctx context.Co
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UsersService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "users.UsersService",
+	ServiceName: "users.v1.UsersService",
 	HandlerType: (*UsersServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -496,6 +530,10 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUser",
 			Handler:    _UsersService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "RestoreUser",
+			Handler:    _UsersService_RestoreUser_Handler,
 		},
 		{
 			MethodName: "GetUser",
@@ -535,5 +573,5 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "user/users.proto",
+	Metadata: "users/v1/users.proto",
 }

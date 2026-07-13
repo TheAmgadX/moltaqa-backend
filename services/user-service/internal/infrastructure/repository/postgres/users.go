@@ -343,7 +343,7 @@ func mapDBRowToUserSummary(rows *pgx.Rows) (*domain.UserSummary, error) {
 	var user domain.UserSummary
 
 	if err := (*rows).Scan(&user.Id, &user.Username, &user.DisplayName,
-		&user.PhoneNumber, &user.ProfileImageURL, &user.ProfileBadge); err != nil {
+		&user.PhoneNumber, &user.ProfileImageURL, &user.AccountBadge); err != nil {
 		return nil, utils_postgres.MapDBErrorToServiceError(err)
 	}
 
@@ -425,33 +425,9 @@ func (r *UserPostgresRepository) GetSummaries(ctx context.Context, ids []string)
 //
 // Search doesn't support searching based on others fields.
 // This search functionality gonna be replaced by an intelligent search service.
-func (r *UserPostgresRepository) Search(ctx context.Context, query string, page, pageSize uint32) (*domain.UserSearchResult, error) {
-	offset := (page - 1) * pageSize
-	search := "%" + query + "%"
-
-	// Count total matches
-	// TODO: Optimize this extra query:
-	// I am thinking in two options:
-	// 1. Changing the repo api to support caching for the result of this query.
-	// 2. Quering for offset + 1 and change the grpc api to support
-	//	  having a field of `has_next` to indicate if there are more results.
-	// I prefer option 2.
-	var total uint32
-	err := r.db.QueryRow(ctx, `
-		SELECT COUNT(*)
-		FROM users u
-		JOIN privacy_settings ps
-		    ON ps.user_id = u.id
-		WHERE ps.find_by_username = TRUE
-		  AND (
-		      u.username ILIKE $1
-		      OR u.display_name ILIKE $1
-  );
-	`, search).Scan(&total)
-
-	if err != nil {
-		return nil, utils_postgres.MapDBErrorToServiceError(err)
-	}
+func (r *UserPostgresRepository) Search(ctx context.Context, user_search *domain.UserSearch) (*domain.UserSearchResult, error) {
+	offset := (user_search.Page - 1) * user_search.PageSize
+	search := "%" + user_search.Query + "%"
 
 	// Second query to fetch paginated results
 	rows, err := r.db.Query(ctx, `
@@ -467,14 +443,14 @@ func (r *UserPostgresRepository) Search(ctx context.Context, query string, page,
 		ORDER BY u.username
 		LIMIT $2
 		OFFSET $3;
-	`, search, pageSize, offset)
+	`, search, user_search.PageSize+1, offset)
 
 	if err != nil {
 		return nil, utils_postgres.MapDBErrorToServiceError(err)
 	}
 	defer rows.Close()
 
-	users := make([]domain.UserSummary, 0)
+	users := make([]domain.UserSummary, 0, user_search.PageSize+1)
 
 	for rows.Next() {
 		user, err := mapDBRowToUserSummary(&rows)
@@ -489,9 +465,18 @@ func (r *UserPostgresRepository) Search(ctx context.Context, query string, page,
 		return nil, err
 	}
 
+	var hasMore bool
+
+	// if the results is more than the page size, we have more to fetch
+	// remove that extra user that was fetched to check if there are more
+	if len(users) > int(user_search.PageSize) {
+		hasMore = true
+		users = users[:user_search.PageSize]
+	}
+
 	return &domain.UserSearchResult{
-		Users:        users,
-		TotalResults: total,
+		Users:   users,
+		HasMore: hasMore,
 	}, nil
 }
 

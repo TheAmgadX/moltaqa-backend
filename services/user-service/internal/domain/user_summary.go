@@ -6,5 +6,5 @@ type UserSummary struct {
 	DisplayName     string
 	PhoneNumber     string
 	ProfileImageURL string
-	ProfileBadge    string
+	AccountBadge    AccountBadgeType
 }

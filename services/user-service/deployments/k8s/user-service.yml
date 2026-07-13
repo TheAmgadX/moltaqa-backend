@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: user-service
+
+  template:
+    metadata:
+      labels:
+        app: user-service
+
+    spec:
+      containers:
+        - name: user-service
+          image: user-service
+          imagePullPolicy: Never
+
+          ports:
+            - name: grpc
+              containerPort: 50051
+              protocol: TCP
+
+          env:
+            - name: GRPC_PORT
+              value: "50051"
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: user-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: user-service
+
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+      appProtocol: grpc
