@@ -16,6 +16,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user *domain.User) error
 	Update(ctx context.Context, userUpdate *domain.UserUpdate) error
 	SoftDelete(ctx context.Context, id string) error
+	RestoreUser(ctx context.Context, id string) error
 
 	// Queries
 	Get(ctx context.Context, lookup domain.Lookup) (*domain.User, error)

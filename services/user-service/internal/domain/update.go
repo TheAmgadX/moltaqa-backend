@@ -1,18 +1,27 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type UserUpdate struct {
 	Id string
 
 	Username        *string
-	DisplayName     *string
+	PhoneNumber     *string
 	Email           *string
-	Phone           *string
-	ProfileImageURL *string
+	ProfileImageUrl *string
 	Bio             *string
-	BioStatus       *string
+	DisplayName     *string
+	EmailVerified   *bool
+	PhoneVerified   *bool
 	BirthDate       *time.Time
+	BioStatus       *string
+	AccountBadge    *AccountBadgeType
+	FriendsCount    *uint32
+	FollowersCount  *uint32
+	FollowingCount  *uint32
+	PostsCount      *uint32
 }
 
 type PrivacySettingsUpdate struct {

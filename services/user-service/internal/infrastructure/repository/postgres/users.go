@@ -122,15 +122,15 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 		i++
 	}
 
-	if userUpdate.Phone != nil {
-		sets = append(sets, fmt.Sprintf("phone = $%d", i))
-		args = append(args, *userUpdate.Phone)
+	if userUpdate.PhoneNumber != nil {
+		sets = append(sets, fmt.Sprintf("phone_number = $%d", i))
+		args = append(args, *userUpdate.PhoneNumber)
 		i++
 	}
 
-	if userUpdate.ProfileImageURL != nil {
+	if userUpdate.ProfileImageUrl != nil {
 		sets = append(sets, fmt.Sprintf("profile_image_url = $%d", i))
-		args = append(args, *userUpdate.ProfileImageURL)
+		args = append(args, *userUpdate.ProfileImageUrl)
 		i++
 	}
 
@@ -149,6 +149,48 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	if userUpdate.BirthDate != nil {
 		sets = append(sets, fmt.Sprintf("birth_date = $%d", i))
 		args = append(args, *userUpdate.BirthDate)
+		i++
+	}
+
+	if userUpdate.AccountBadge != nil {
+		sets = append(sets, fmt.Sprintf("account_badge = $%d", i))
+		args = append(args, *userUpdate.AccountBadge)
+		i++
+	}
+
+	if userUpdate.PhoneVerified != nil {
+		sets = append(sets, fmt.Sprintf("phone_verified = $%d", i))
+		args = append(args, *userUpdate.PhoneVerified)
+		i++
+	}
+
+	if userUpdate.EmailVerified != nil {
+		sets = append(sets, fmt.Sprintf("email_verified = $%d", i))
+		args = append(args, *userUpdate.EmailVerified)
+		i++
+	}
+
+	if userUpdate.FriendsCount != nil {
+		sets = append(sets, fmt.Sprintf("friends_count = $%d", i))
+		args = append(args, *userUpdate.FriendsCount)
+		i++
+	}
+
+	if userUpdate.FollowersCount != nil {
+		sets = append(sets, fmt.Sprintf("followers_count = $%d", i))
+		args = append(args, *userUpdate.FollowersCount)
+		i++
+	}
+
+	if userUpdate.FollowingCount != nil {
+		sets = append(sets, fmt.Sprintf("following_count = $%d", i))
+		args = append(args, *userUpdate.FollowingCount)
+		i++
+	}
+
+	if userUpdate.PostsCount != nil {
+		sets = append(sets, fmt.Sprintf("posts_count = $%d", i))
+		args = append(args, *userUpdate.PostsCount)
 		i++
 	}
 
@@ -177,6 +219,22 @@ func (r *UserPostgresRepository) SoftDelete(ctx context.Context, id string) erro
 	query := `
 		UPDATE users
 		SET soft_delete = NOW()
+		WHERE id = $1;
+	`
+
+	if id == "" {
+		return domain.ErrInvalidUserId
+	}
+
+	_, err := r.db.Exec(ctx, query, id)
+
+	return utils_postgres.MapDBErrorToServiceError(err)
+}
+
+func (r *UserPostgresRepository) RestoreUser(ctx context.Context, id string) error {
+	query := `
+		UPDATE users
+		SET soft_delete = NULL
 		WHERE id = $1;
 	`
 
