@@ -14,7 +14,7 @@ COPY services/user-service ./services/user-service
 WORKDIR /app/services/user-service
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
-   go build -o user-service ./cmd
+    go build -o user-service ./cmd
 
 FROM alpine:3.22
 
