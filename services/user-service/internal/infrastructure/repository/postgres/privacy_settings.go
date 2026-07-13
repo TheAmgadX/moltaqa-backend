@@ -13,10 +13,9 @@ import (
 func mapRowToPrivacySettings(row *pgx.Rows) (*domain.PrivacySettings, error) {
 	var settings domain.PrivacySettings
 
-	err := (*row).Scan(&settings, &settings.AvatarVisibility,
+	err := (*row).Scan(&settings, &settings.UserId, &settings.AvatarVisibility,
 		&settings.PhoneVisibility, &settings.EmailVisibility,
-		&settings.LastSeenVisibility, &settings.DiscoverByPhone,
-		&settings.AllowMessagesByUsername, &settings.ReadReceiptsEnabled,
+		&settings.LastSeenVisibility, &settings.ReadReceiptsEnabled, &settings.FindByUsername,
 	)
 
 	if err != nil {

@@ -12,7 +12,7 @@ import (
 
 func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) error {
 	if user == nil {
-		return ErrInvalidUserInput
+		return domain.ErrInvalidUserInput
 	}
 
 	// begin a transaction
@@ -153,7 +153,7 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	}
 
 	if len(sets) == 0 {
-		return ErrNothingToUpdate
+		return domain.ErrNothingToUpdate
 	}
 
 	sets = append(sets, "updated_at = NOW()")
@@ -181,7 +181,7 @@ func (r *UserPostgresRepository) SoftDelete(ctx context.Context, id string) erro
 	`
 
 	if id == "" {
-		return ErrInvalidUserId
+		return domain.ErrInvalidUserId
 	}
 
 	_, err := r.db.Exec(ctx, query, id)
@@ -223,7 +223,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 	defer rows.Close()
 
 	if !rows.Next() {
-		return nil, ErrUserNotFound
+		return nil, domain.ErrUserNotFound
 	}
 
 	user, err := mapDBRowToUser(&rows)
@@ -237,7 +237,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 
 func (r *UserPostgresRepository) GetUsers(ctx context.Context, ids []string) ([]domain.User, error) {
 	if len(ids) == 0 {
-		return nil, ErrEmptyUserIdSlice
+		return nil, domain.ErrEmptyUserIdSlice
 	}
 
 	query := `
@@ -294,7 +294,7 @@ func mapDBRowToUserSummary(rows *pgx.Rows) (*domain.UserSummary, error) {
 
 func (r *UserPostgresRepository) GetSummary(ctx context.Context, id string) (*domain.UserSummary, error) {
 	if id == "" {
-		return nil, ErrInvalidUserId
+		return nil, domain.ErrInvalidUserId
 	}
 
 	query := `
@@ -312,7 +312,7 @@ func (r *UserPostgresRepository) GetSummary(ctx context.Context, id string) (*do
 	defer rows.Close()
 
 	if !rows.Next() {
-		return nil, ErrUserNotFound
+		return nil, domain.ErrUserNotFound
 	}
 
 	user, err := mapDBRowToUserSummary(&rows)
