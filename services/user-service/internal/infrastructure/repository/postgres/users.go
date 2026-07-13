@@ -15,6 +15,22 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		return ErrInvalidUserInput
 	}
 
+	// begin a transaction
+	// the user creation should not be committed until the privacy settings are also created
+	// to make sure the user and privacy settings are both created or neither are created
+	tx, err := r.db.Begin(ctx)
+
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	// make sure to rollback the transaction if an error occurs
+	defer func() {
+		if err != nil {
+			tx.Rollback(ctx)
+		}
+	}()
+
 	query := `
 		INSERT INTO users (
 		    id,
@@ -38,7 +54,7 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		);
 	`
 
-	_, err := r.db.Exec(
+	_, err = r.db.Exec(
 		ctx,
 		query,
 		user.Id,
@@ -50,6 +66,32 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		user.Bio,
 		user.BioStatus,
 	)
+
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	// add the privacy settings row with default values
+	query = `
+		INSERT INTO privacy_settings (
+			user_id,
+		)
+		VALUES (
+		    $1
+		)
+	`
+
+	_, err = r.db.Exec(
+		ctx,
+		query,
+		user.Id,
+	)
+
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	err = tx.Commit(ctx)
 
 	return utils_postgres.MapDBErrorToServiceError(err)
 }
