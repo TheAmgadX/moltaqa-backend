@@ -20,7 +20,10 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	UsersService_CreateUser_FullMethodName            = "/users.v1.UsersService/CreateUser"
+	UsersService_RegisterContact_FullMethodName       = "/users.v1.UsersService/RegisterContact"
 	UsersService_UpdateUser_FullMethodName            = "/users.v1.UsersService/UpdateUser"
+	UsersService_VerifyEmail_FullMethodName           = "/users.v1.UsersService/VerifyEmail"
+	UsersService_VerifyPhone_FullMethodName           = "/users.v1.UsersService/VerifyPhone"
 	UsersService_DeleteUser_FullMethodName            = "/users.v1.UsersService/DeleteUser"
 	UsersService_RestoreUser_FullMethodName           = "/users.v1.UsersService/RestoreUser"
 	UsersService_GetUser_FullMethodName               = "/users.v1.UsersService/GetUser"
@@ -39,7 +42,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	RegisterContact(ctx context.Context, in *RegisterContactRequest, opts ...grpc.CallOption) (*RegisterContactResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	VerifyEmail(ctx context.Context, in *VerifyContactRequest, opts ...grpc.CallOption) (*VerifyContactResponse, error)
+	VerifyPhone(ctx context.Context, in *VerifyContactRequest, opts ...grpc.CallOption) (*VerifyContactResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
 	RestoreUser(ctx context.Context, in *RestoreUserRequest, opts ...grpc.CallOption) (*RestoreUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
@@ -71,10 +77,40 @@ func (c *usersServiceClient) CreateUser(ctx context.Context, in *CreateUserReque
 	return out, nil
 }
 
+func (c *usersServiceClient) RegisterContact(ctx context.Context, in *RegisterContactRequest, opts ...grpc.CallOption) (*RegisterContactResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RegisterContactResponse)
+	err := c.cc.Invoke(ctx, UsersService_RegisterContact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *usersServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UpdateUserResponse)
 	err := c.cc.Invoke(ctx, UsersService_UpdateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) VerifyEmail(ctx context.Context, in *VerifyContactRequest, opts ...grpc.CallOption) (*VerifyContactResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyContactResponse)
+	err := c.cc.Invoke(ctx, UsersService_VerifyEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersServiceClient) VerifyPhone(ctx context.Context, in *VerifyContactRequest, opts ...grpc.CallOption) (*VerifyContactResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyContactResponse)
+	err := c.cc.Invoke(ctx, UsersService_VerifyPhone_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +232,10 @@ func (c *usersServiceClient) UpdatePrivacySettings(ctx context.Context, in *Upda
 // for forward compatibility.
 type UsersServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	RegisterContact(context.Context, *RegisterContactRequest) (*RegisterContactResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	VerifyEmail(context.Context, *VerifyContactRequest) (*VerifyContactResponse, error)
+	VerifyPhone(context.Context, *VerifyContactRequest) (*VerifyContactResponse, error)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
 	RestoreUser(context.Context, *RestoreUserRequest) (*RestoreUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -221,8 +260,17 @@ type UnimplementedUsersServiceServer struct{}
 func (UnimplementedUsersServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUser not implemented")
 }
+func (UnimplementedUsersServiceServer) RegisterContact(context.Context, *RegisterContactRequest) (*RegisterContactResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RegisterContact not implemented")
+}
 func (UnimplementedUsersServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedUsersServiceServer) VerifyEmail(context.Context, *VerifyContactRequest) (*VerifyContactResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
+}
+func (UnimplementedUsersServiceServer) VerifyPhone(context.Context, *VerifyContactRequest) (*VerifyContactResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifyPhone not implemented")
 }
 func (UnimplementedUsersServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteUser not implemented")
@@ -296,6 +344,24 @@ func _UsersService_CreateUser_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UsersService_RegisterContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterContactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).RegisterContact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_RegisterContact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).RegisterContact(ctx, req.(*RegisterContactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UsersService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserRequest)
 	if err := dec(in); err != nil {
@@ -310,6 +376,42 @@ func _UsersService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UsersServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyContactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).VerifyEmail(ctx, req.(*VerifyContactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UsersService_VerifyPhone_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyContactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UsersServiceServer).VerifyPhone(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UsersService_VerifyPhone_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UsersServiceServer).VerifyPhone(ctx, req.(*VerifyContactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -524,8 +626,20 @@ var UsersService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UsersService_CreateUser_Handler,
 		},
 		{
+			MethodName: "RegisterContact",
+			Handler:    _UsersService_RegisterContact_Handler,
+		},
+		{
 			MethodName: "UpdateUser",
 			Handler:    _UsersService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _UsersService_VerifyEmail_Handler,
+		},
+		{
+			MethodName: "VerifyPhone",
+			Handler:    _UsersService_VerifyPhone_Handler,
 		},
 		{
 			MethodName: "DeleteUser",

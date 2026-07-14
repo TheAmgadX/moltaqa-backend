@@ -23,8 +23,8 @@ type User struct {
 	ProfileImageUrl string
 	Bio             string
 	DisplayName     string
-	EmailVerified   bool
-	PhoneVerified   bool
+	EmailVerified   time.Time
+	PhoneVerified   time.Time
 	BirthDate       time.Time
 	BioStatus       string
 	AccountBadge    AccountBadgeType

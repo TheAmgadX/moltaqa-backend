@@ -16,8 +16,8 @@ func mapCreateUserRequestToDomain(req *pb.CreateUserRequest) *domain.User {
 		Email:          req.Email,
 		PhoneNumber:    req.Phone,
 		DisplayName:    req.DisplayName,
-		EmailVerified:  false,
-		PhoneVerified:  false,
+		EmailVerified:  time.Time{},
+		PhoneVerified:  time.Time{},
 		BirthDate:      time.Time{},
 		BioStatus:      "",
 		AccountBadge:   domain.UNVERIFIED,
@@ -26,6 +26,28 @@ func mapCreateUserRequestToDomain(req *pb.CreateUserRequest) *domain.User {
 		FollowingCount: 0,
 		PostsCount:     0,
 		DeletedAt:      time.Time{},
+	}
+}
+
+func mapRegisterContactRequestToDomain(req *pb.RegisterContactRequest) *domain.ContactRequest {
+	var contactType domain.ContactLookupType
+	var value string
+
+	switch lookup := req.ContactType.(type) {
+	case *pb.RegisterContactRequest_Email:
+		contactType = domain.ContactLookupTypeEmail
+		value = lookup.Email
+	case *pb.RegisterContactRequest_Phone:
+		contactType = domain.ContactLookupTypePhone
+		value = lookup.Phone
+	}
+
+	return &domain.ContactRequest{
+		UserId: req.UserId,
+		ContactLookup: domain.ContactLookup{
+			Type:  contactType,
+			Value: value,
+		},
 	}
 }
 
@@ -38,11 +60,7 @@ func mapUpdateUserRequestToDomain(req *pb.UpdateUserRequest) (*domain.User, erro
 	return &domain.User{
 		Id:             id,
 		Username:       req.Username,
-		Email:          req.Email,
-		PhoneNumber:    req.Phone,
 		DisplayName:    req.DisplayName,
-		EmailVerified:  req.EmailVerified,
-		PhoneVerified:  req.PhoneVerified,
 		BirthDate:      mapTimeToDomain(req.BirthDate),
 		BioStatus:      req.BioStatus,
 		AccountBadge:   mapAccountBadgeToDomain(req.AccountBadge),
@@ -104,8 +122,8 @@ func mapUserToProto(user *domain.User) *pb.User {
 		Email:          user.Email,
 		Phone:          user.PhoneNumber,
 		DisplayName:    user.DisplayName,
-		EmailVerified:  user.EmailVerified,
-		PhoneVerified:  user.PhoneVerified,
+		EmailVerified:  mapTimeToProto(user.EmailVerified),
+		PhoneVerified:  mapTimeToProto(user.PhoneVerified),
 		BirthDate:      mapTimeToProto(user.BirthDate),
 		BioStatus:      user.BioStatus,
 		AccountBadge:   mapAccountBadgeToProto(user.AccountBadge),

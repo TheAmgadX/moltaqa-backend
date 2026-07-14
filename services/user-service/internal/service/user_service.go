@@ -17,7 +17,19 @@ func (s *UserService) Create(ctx context.Context, user *domain.User) error {
 	return nil
 }
 
+func (s *UserService) RegisterContact(ctx context.Context, contact *domain.ContactRequest) error {
+	return nil
+}
+
 func (s *UserService) Update(ctx context.Context, user *domain.User) error {
+	return nil
+}
+
+func (s *UserService) VerifyEmail(ctx context.Context, userId string) error {
+	return nil
+}
+
+func (s *UserService) VerifyPhone(ctx context.Context, userId string) error {
 	return nil
 }
 

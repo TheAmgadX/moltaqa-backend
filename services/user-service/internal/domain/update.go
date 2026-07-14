@@ -8,13 +8,9 @@ type UserUpdate struct {
 	Id string
 
 	Username        *string
-	PhoneNumber     *string
-	Email           *string
 	ProfileImageUrl *string
 	Bio             *string
 	DisplayName     *string
-	EmailVerified   *bool
-	PhoneVerified   *bool
 	BirthDate       *time.Time
 	BioStatus       *string
 	AccountBadge    *AccountBadgeType

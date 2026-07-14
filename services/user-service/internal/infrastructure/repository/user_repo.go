@@ -14,7 +14,10 @@ import (
 type UserRepository interface {
 	// Commands
 	Create(ctx context.Context, user *domain.User) error
+	RegisterContact(ctx context.Context, user *domain.ContactRequest) error
 	Update(ctx context.Context, userUpdate *domain.UserUpdate) error
+	VerifyEmail(ctx context.Context, id string) error
+	VerifyPhone(ctx context.Context, id string) error
 	SoftDelete(ctx context.Context, id string) error
 	RestoreUser(ctx context.Context, id string) error
 

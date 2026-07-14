@@ -96,6 +96,32 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 	return utils_postgres.MapDBErrorToServiceError(err)
 }
 
+func (r *UserPostgresRepository) RegisterContact(ctx context.Context, contact *domain.ContactRequest) error {
+	query := fmt.Sprintf(`
+		UPDATE users
+		SET
+			%s = $1
+		WHERE user_id = $2
+	`, contact.TypeString())
+
+	if contact.UserId == "" {
+		return domain.ErrInvalidUserId
+	}
+
+	_, err := r.db.Exec(
+		ctx,
+		query,
+		contact.UserId,
+		contact.Value(),
+	)
+
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	return nil
+}
+
 func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.UserUpdate) error {
 	// dynamic SQL generation
 	var (
@@ -113,18 +139,6 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	if userUpdate.DisplayName != nil {
 		sets = append(sets, fmt.Sprintf("display_name = $%d", i))
 		args = append(args, *userUpdate.DisplayName)
-		i++
-	}
-
-	if userUpdate.Email != nil {
-		sets = append(sets, fmt.Sprintf("email = $%d", i))
-		args = append(args, *userUpdate.Email)
-		i++
-	}
-
-	if userUpdate.PhoneNumber != nil {
-		sets = append(sets, fmt.Sprintf("phone_number = $%d", i))
-		args = append(args, *userUpdate.PhoneNumber)
 		i++
 	}
 
@@ -155,18 +169,6 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	if userUpdate.AccountBadge != nil {
 		sets = append(sets, fmt.Sprintf("account_badge = $%d", i))
 		args = append(args, *userUpdate.AccountBadge)
-		i++
-	}
-
-	if userUpdate.PhoneVerified != nil {
-		sets = append(sets, fmt.Sprintf("phone_verified = $%d", i))
-		args = append(args, *userUpdate.PhoneVerified)
-		i++
-	}
-
-	if userUpdate.EmailVerified != nil {
-		sets = append(sets, fmt.Sprintf("email_verified = $%d", i))
-		args = append(args, *userUpdate.EmailVerified)
 		i++
 	}
 
@@ -211,6 +213,30 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	args = append(args, userUpdate.Id)
 
 	_, err := r.db.Exec(ctx, query, args...)
+
+	return utils_postgres.MapDBErrorToServiceError(err)
+}
+
+func (r *UserPostgresRepository) VerifyEmail(ctx context.Context, id string) error {
+	query := `
+		UPDATE users
+		SET email_verified = NOW()
+		WHERE id = $1;
+	`
+
+	_, err := r.db.Exec(ctx, query, id)
+
+	return utils_postgres.MapDBErrorToServiceError(err)
+}
+
+func (r *UserPostgresRepository) VerifyPhone(ctx context.Context, id string) error {
+	query := `
+		UPDATE users
+		SET phone_verified = NOW()
+		WHERE id = $1;
+	`
+
+	_, err := r.db.Exec(ctx, query, id)
 
 	return utils_postgres.MapDBErrorToServiceError(err)
 }
