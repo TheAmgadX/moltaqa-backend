@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-bootstrap
+  namespace: kafka
+spec:
+  backoffLimit: 5
+
+  template:
+    metadata:
+      labels:
+        app: kafka-bootstrap
+
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+        - name: kafka-bootstrap
+
+          image: kafka-bootstrap:latest
+          imagePullPolicy: Never
+
+          envFrom:
+            - configMapRef:
+                name: kafka-config
+
+          env:
+            # - name: KAFKA_BROKERS
+            #   value: kafka-kafka-bootstrap:9092
+
+            - name: KAFKA_USERNAME
+              value: kafka-admin
+
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-admin
+                  key: password
+
+            # - name: KAFKA_MECHANISM
+            #   value: SCRAM-SHA-512
+
+            # - name: KAFKA_TLS_ENABLED
+            #   value: "false" # this will be changed in production.
