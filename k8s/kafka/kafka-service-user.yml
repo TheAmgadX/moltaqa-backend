@@ -1,0 +1,47 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaUser
+
+metadata:
+  name: kafka-services
+  namespace: kafka
+
+spec:
+  authentication:
+    type: scram-sha-512
+
+  authorization:
+    type: simple
+    acls:
+      #
+      # Allow producing to any topic
+      #
+      - resource:
+          type: topic
+          name: "*"
+          patternType: literal
+        operation: Write
+
+      #
+      # Allow consuming from any topic
+      #
+      - resource:
+          type: topic
+          name: "*"
+          patternType: literal
+        operation: Read
+
+      #
+      # Allow consumer groups
+      #
+      - resource:
+          type: group
+          name: "*"
+          patternType: literal
+        operation: Read
+
+      #
+      # Read cluster metadata
+      #
+      - resource:
+          type: cluster
+        operation: Describe

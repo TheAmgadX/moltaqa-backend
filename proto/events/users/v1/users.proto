@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package events.users.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "shared/events/users;users-events";
+
+message UserCreated {
+  string id = 1;
+  string username = 2;
+}

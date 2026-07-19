@@ -1,0 +1,19 @@
+# ==========================================================
+# Kafka configuration for a Deployment
+#
+# Copy and modify this into every Deployment that uses Kafka.
+# ==========================================================
+
+envFrom:
+  - configMapRef:
+      name: kafka-config
+
+env:
+  - name: KAFKA_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: kafka-services
+        key: password
+
+  - name: KAFKA_USERNAME
+    value: service-name
