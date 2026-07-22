@@ -25,6 +25,9 @@ type Config struct {
 	Password  string
 	Mechanism SASLMechanism
 
+	// Consumer group ID for the client.
+	GroupID string
+
 	// Whether to use TLS when connecting to brokers.
 	TLS bool
 }
@@ -38,7 +41,7 @@ const (
 	SASLMechanismSCRAMSHA512 SASLMechanism = "SCRAM-SHA-512"
 )
 
-func NewConfig(clientID string) *Config {
+func NewConfig(clientID string, groupID string) *Config {
 	return &Config{
 		Brokers: strings.Split(
 			env.GetString("KAFKA_BROKERS", ""),
@@ -46,6 +49,7 @@ func NewConfig(clientID string) *Config {
 		),
 
 		ClientId: clientID,
+		GroupID:  groupID,
 
 		Username: env.GetString("KAFKA_USERNAME", ""),
 		Password: env.GetString("KAFKA_PASSWORD", ""),
