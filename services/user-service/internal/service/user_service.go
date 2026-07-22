@@ -4,13 +4,15 @@ import (
 	"context"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/infrastructure/repository"
 )
 
 type UserService struct {
+	repo repository.UserRepository
 }
 
-func NewService() *UserService {
-	return &UserService{}
+func NewService(repo repository.UserRepository) (*UserService, error) {
+	return &UserService{repo: repo}, nil
 }
 
 func (s *UserService) Create(ctx context.Context, user *domain.User) error {
