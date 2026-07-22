@@ -41,7 +41,7 @@ func createTopics(admin *kadm.Client) {
 }
 
 func main() {
-	cfg := kafka.NewConfig(serviceId)
+	cfg := kafka.NewConfig(serviceId, "")
 
 	client, err := kafka.NewClient(cfg)
 	if err != nil {

@@ -40,8 +40,14 @@ func NewClient(cfg *Config) (*kgo.Client, error) {
 	opts := []kgo.Opt{
 		kgo.SeedBrokers(cfg.Brokers...),
 		kgo.ClientID(cfg.ClientId),
-		kgo.AutoCommitMarks(),
 		// kgo.WithLogger(logger),
+	}
+
+	if cfg.GroupID != "" {
+		opts = append(opts,
+			kgo.ConsumerGroup(cfg.GroupID),
+			kgo.AutoCommitMarks(),
+		)
 	}
 
 	if cfg.Username != "" {
