@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -10,11 +11,25 @@ import (
 	"time"
 
 	user_grpc "github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/infrastructure/grpc"
+	repository "github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/infrastructure/repository/postgres"
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/service"
 	"github.com/TheAmgadX/moltaqa-backend/shared/env"
 	pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 	"google.golang.org/grpc"
 )
+
+func build_DB_DSN() string {
+	host := env.GetString("DB_HOST", "localhost")
+	port := env.GetString("DB_PORT", "5432")
+	user := env.GetString("DB_USER", "postgres")
+	pass := env.GetString("DB_PASSWORD", "postgres")
+	dbName := env.GetString("DB_NAME", "postgres")
+
+	// postgres://<user>:<password>@<host>:<port>/<dbname>?sslmode=disable
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		user, pass, host, port, dbName,
+	)
+}
 
 func createServer(port string) (*grpc.Server, *net.Listener, error) {
 	lis, err := net.Listen("tcp", ":"+port)
@@ -25,7 +40,19 @@ func createServer(port string) (*grpc.Server, *net.Listener, error) {
 
 	grpc_server := grpc.NewServer()
 
-	service := service.NewService()
+	repo, err := repository.NewUserPostgresRepository(build_DB_DSN())
+
+	if err != nil {
+		log.Printf("failed to create repository: %v\n", err)
+		return nil, nil, err
+	}
+
+	service, err := service.NewService(repo)
+
+	if err != nil {
+		log.Printf("failed to create service: %v\n", err)
+		return nil, nil, err
+	}
 
 	pb.RegisterUsersServiceServer(grpc_server, user_grpc.NewUserGRPCServer(service))
 

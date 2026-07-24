@@ -26,7 +26,7 @@ type UserRepository interface {
 	GetUsers(ctx context.Context, ids []string) ([]domain.User, error)
 	GetSummary(ctx context.Context, id string) (*domain.UserSummary, error)
 	GetSummaries(ctx context.Context, ids []string) ([]domain.UserSummary, error)
-	Search(ctx context.Context, query string, page, pageSize uint32) (*domain.UserSearchResult, error)
+	Search(ctx context.Context, user_search *domain.UserSearch) (*domain.UserSearchResult, error)
 
 	// Validation
 	Exists(ctx context.Context, lookup domain.Lookup) (bool, error)

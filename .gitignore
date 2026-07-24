@@ -4,3 +4,5 @@ secrets.yml
 
 # builds
 build/
+
+services/user-service/deployments/k8s/postgres_secrets.yml
