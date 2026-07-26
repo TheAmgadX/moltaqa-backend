@@ -6,13 +6,13 @@ import (
 	"github.com/google/uuid"
 )
 
-type AccountBadgeType int
+type AccountBadgeType string
 
 const (
-	UNVERIFIED AccountBadgeType = iota
-	BLUE_BADGE
-	GOLDEN_BADGE
-	SILVER_BADGE
+	UNVERIFIED   AccountBadgeType = "unverified"
+	BLUE_BADGE   AccountBadgeType = "blue_badge"
+	GOLDEN_BADGE AccountBadgeType = "golden_badge"
+	SILVER_BADGE AccountBadgeType = "silver_badge"
 )
 
 type User struct {
