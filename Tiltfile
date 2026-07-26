@@ -30,6 +30,21 @@ k8s_yaml("services/user-service/deployments/k8s/postgres_statefulset.yml")
 # This works because postgres-user-service is a StatefulSet
 k8s_resource("postgres-user-service", labels=["Databases"])
 
+# database migrations
+k8s_yaml("services/user-service/deployments/k8s/migration-job.yml")
+
+docker_build(
+    "user-db-migration",
+    ".",
+    dockerfile="services/user-service/deployments/docker/Dockerfile.migrate",
+)
+
+k8s_resource(
+    "user-db-migration",
+    resource_deps=["postgres-user-service"],
+    labels=["Jobs"],
+)
+
 k8s_yaml("services/user-service/deployments/k8s/user-service.yml")
 docker_build(
     "user-service",
@@ -37,7 +52,7 @@ docker_build(
     dockerfile="services/user-service/deployments/docker/Dockerfile",
 )
 
-k8s_resource("user-service", port_forwards='50051:50051', labels=["Services"])
+k8s_resource("user-service",resource_deps=["user-db-migration"],port_forwards='50051:50051', labels=["Services"])
 
 # ---------- kafka-bootstrap ----------
 k8s_yaml("services/kafka-bootstrap/deployments/k8s/job.yml")

@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: user-db-migration
+
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+      - name: migration
+
+        image: user-db-migration:latest
+
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-user-secret
+              key: POSTGRES_PASSWORD
+
+        command: ["/bin/sh", "-c"]
+
+        args:
+          - >
+            migrate
+            -path /migrations
+            -database "postgres://user_admin:${DB_PASSWORD}@postgres-user-service:5432/user_db?sslmode=disable"
+            up
