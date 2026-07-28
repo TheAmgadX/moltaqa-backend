@@ -1,20 +1,20 @@
 CREATE TABLE users (
     id UUID PRIMARY KEY,
 
-    username VARCHAR(30) NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE,
     phone TEXT UNIQUE NULL,
     email TEXT UNIQUE NULL,
 
     profile_image_url TEXT NULL,
-    bio VARCHAR(250) DEFAULT '',
-    display_name VARCHAR(50),
+    bio TEXT DEFAULT '',
+    display_name TEXT,
 
     email_verified TIMESTAMP NULL,
     phone_verified TIMESTAMP NULL,
 
     birth_date DATE NULL,
 
-    bio_status VARCHAR(50) DEFAULT '',
+    bio_status TEXT DEFAULT '',
 
     account_badge TEXT NOT NULL DEFAULT 'unverified'
         CHECK (
