@@ -262,12 +262,27 @@ func mapUserExistanceToProto(result []domain.UserExistence) []*pb.UserExistence 
 	return protoResult
 }
 
+func mapVisibilityToProto(visibility domain.Visibility) pb.Visibility {
+	switch visibility {
+	case domain.EVERYONE:
+		return pb.Visibility_EVERYONE
+	case domain.FRIENDS:
+		return pb.Visibility_FRIENDS
+	case domain.CONTACTS:
+		return pb.Visibility_CONTACTS
+	case domain.NOBODY:
+		return pb.Visibility_NOBODY
+	default:
+		return pb.Visibility_NOBODY
+	}
+}
+
 func mapPrivacySettingsToProto(settings *domain.PrivacySettings) *pb.PrivacySettings {
 	return &pb.PrivacySettings{
-		AvatarVisibility:    pb.Visibility(settings.AvatarVisibility),
-		PhoneVisibility:     pb.Visibility(settings.PhoneVisibility),
-		EmailVisibility:     pb.Visibility(settings.EmailVisibility),
-		LastSeenVisibility:  pb.Visibility(settings.LastSeenVisibility),
+		AvatarVisibility:    mapVisibilityToProto(settings.AvatarVisibility),
+		PhoneVisibility:     mapVisibilityToProto(settings.PhoneVisibility),
+		EmailVisibility:     mapVisibilityToProto(settings.EmailVisibility),
+		LastSeenVisibility:  mapVisibilityToProto(settings.LastSeenVisibility),
 		ReadReceiptsEnabled: settings.ReadReceiptsEnabled,
 		FindByUsername:      settings.FindByUsername,
 	}
