@@ -2,13 +2,13 @@ package domain
 
 import "github.com/google/uuid"
 
-type Visibility int
+type Visibility string
 
 const (
-	EVERYONE Visibility = iota
-	FRIENDS
-	CONTACTS
-	NOBODY
+	EVERYONE Visibility = "everyone"
+	FRIENDS  Visibility = "friends"
+	CONTACTS Visibility = "contacts"
+	NOBODY   Visibility = "nobody"
 )
 
 type PrivacySettings struct {
