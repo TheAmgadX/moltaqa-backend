@@ -249,14 +249,18 @@ func mapUsersSummariesToProto(users []domain.UserSummary) []*pb.UserSummary {
 	return result
 }
 
-func mapUserExistanceToProto(result []domain.UserExistence) []*pb.UserExistence {
+func mapUserExistanceToProto(user domain.UserExistence) *pb.UserExistence {
+	return &pb.UserExistence{
+		UserId: user.Id,
+		Exists: user.Exists,
+	}
+}
+
+func mapUsersExistanceToProto(result []domain.UserExistence) []*pb.UserExistence {
 	protoResult := make([]*pb.UserExistence, 0, len(result))
 
 	for _, user := range result {
-		protoResult = append(protoResult, &pb.UserExistence{
-			UserId: user.Id,
-			Exists: user.Exists,
-		})
+		protoResult = append(protoResult, mapUserExistanceToProto(user))
 	}
 
 	return protoResult

@@ -259,18 +259,18 @@ message UserExistsRequest {
   }
 }
 
-message UserExistsResponse {
-  bool exists = 1;
-}
-
-message UsersExistRequest {
-  repeated string user_ids = 1;
-}
-
 message UserExistence {
   string user_id = 1;
 
   bool exists = 2;
+}
+
+message UserExistsResponse {
+  UserExistence response = 1;
+}
+
+message UsersExistRequest {
+  repeated string user_ids = 1;
 }
 
 message UsersExistResponse {

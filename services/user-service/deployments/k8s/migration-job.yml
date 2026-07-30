@@ -9,22 +9,22 @@ spec:
       restartPolicy: OnFailure
 
       containers:
-      - name: migration
+        - name: migration
 
-        image: user-db-migration:latest
+          image: user-db-migration:latest
 
-        env:
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-user-secret
-              key: POSTGRES_PASSWORD
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-user-secret
+                  key: POSTGRES_PASSWORD
 
-        command: ["/bin/sh", "-c"]
+          command: ["/bin/sh", "-c"]
 
-        args:
-          - >
-            migrate
-            -path /migrations
-            -database "postgres://user_admin:${DB_PASSWORD}@postgres-user-service:5432/user_db?sslmode=disable"
-            up
+          args:
+            - >
+              migrate
+              -path /migrations
+              -database "postgres://user_admin:${DB_PASSWORD}@postgres-user-service:5432/user_db?sslmode=disable"
+              up

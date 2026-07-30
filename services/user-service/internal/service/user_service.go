@@ -63,8 +63,8 @@ func (s *UserService) SearchUsers(ctx context.Context, req *domain.UserSearch) (
 	return nil, nil
 }
 
-func (s *UserService) UserExists(ctx context.Context, lookup domain.Lookup) (bool, error) {
-	return false, nil
+func (s *UserService) UserExists(ctx context.Context, lookup domain.Lookup) (domain.UserExistence, error) {
+	return domain.UserExistence{}, nil
 }
 
 func (s *UserService) UsersExist(ctx context.Context, userIds []string) ([]domain.UserExistence, error) {

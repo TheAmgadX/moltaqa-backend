@@ -174,14 +174,14 @@ func (s *UserGRPCServer) UserExists(ctx context.Context, req *pb.UserExistsReque
 		return nil, mapServiceError(err)
 	}
 
-	exists, err := s.service.UserExists(ctx, lookup)
+	response, err := s.service.UserExists(ctx, lookup)
 
 	if err != nil {
 		return nil, mapServiceError(err)
 	}
 
 	return &pb.UserExistsResponse{
-		Exists: exists,
+		Response: mapUserExistanceToProto(response),
 	}, nil
 }
 
@@ -193,7 +193,7 @@ func (s *UserGRPCServer) UsersExist(ctx context.Context, req *pb.UsersExistReque
 	}
 
 	return &pb.UsersExistResponse{
-		Users: mapUserExistanceToProto(result),
+		Users: mapUsersExistanceToProto(result),
 	}, nil
 }
 

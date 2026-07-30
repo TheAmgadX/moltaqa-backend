@@ -1777,94 +1777,6 @@ func (*UserExistsRequest_Email) isUserExistsRequest_Lookup() {}
 
 func (*UserExistsRequest_Phone) isUserExistsRequest_Lookup() {}
 
-type UserExistsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UserExistsResponse) Reset() {
-	*x = UserExistsResponse{}
-	mi := &file_users_v1_users_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UserExistsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UserExistsResponse) ProtoMessage() {}
-
-func (x *UserExistsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_users_v1_users_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserExistsResponse.ProtoReflect.Descriptor instead.
-func (*UserExistsResponse) Descriptor() ([]byte, []int) {
-	return file_users_v1_users_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *UserExistsResponse) GetExists() bool {
-	if x != nil {
-		return x.Exists
-	}
-	return false
-}
-
-type UsersExistRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UsersExistRequest) Reset() {
-	*x = UsersExistRequest{}
-	mi := &file_users_v1_users_proto_msgTypes[27]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UsersExistRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UsersExistRequest) ProtoMessage() {}
-
-func (x *UsersExistRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_users_v1_users_proto_msgTypes[27]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UsersExistRequest.ProtoReflect.Descriptor instead.
-func (*UsersExistRequest) Descriptor() ([]byte, []int) {
-	return file_users_v1_users_proto_rawDescGZIP(), []int{27}
-}
-
-func (x *UsersExistRequest) GetUserIds() []string {
-	if x != nil {
-		return x.UserIds
-	}
-	return nil
-}
-
 type UserExistence struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -1875,7 +1787,7 @@ type UserExistence struct {
 
 func (x *UserExistence) Reset() {
 	*x = UserExistence{}
-	mi := &file_users_v1_users_proto_msgTypes[28]
+	mi := &file_users_v1_users_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1887,7 +1799,7 @@ func (x *UserExistence) String() string {
 func (*UserExistence) ProtoMessage() {}
 
 func (x *UserExistence) ProtoReflect() protoreflect.Message {
-	mi := &file_users_v1_users_proto_msgTypes[28]
+	mi := &file_users_v1_users_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1900,7 +1812,7 @@ func (x *UserExistence) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserExistence.ProtoReflect.Descriptor instead.
 func (*UserExistence) Descriptor() ([]byte, []int) {
-	return file_users_v1_users_proto_rawDescGZIP(), []int{28}
+	return file_users_v1_users_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UserExistence) GetUserId() string {
@@ -1915,6 +1827,94 @@ func (x *UserExistence) GetExists() bool {
 		return x.Exists
 	}
 	return false
+}
+
+type UserExistsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Response      *UserExistence         `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserExistsResponse) Reset() {
+	*x = UserExistsResponse{}
+	mi := &file_users_v1_users_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserExistsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserExistsResponse) ProtoMessage() {}
+
+func (x *UserExistsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_users_v1_users_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserExistsResponse.ProtoReflect.Descriptor instead.
+func (*UserExistsResponse) Descriptor() ([]byte, []int) {
+	return file_users_v1_users_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *UserExistsResponse) GetResponse() *UserExistence {
+	if x != nil {
+		return x.Response
+	}
+	return nil
+}
+
+type UsersExistRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UsersExistRequest) Reset() {
+	*x = UsersExistRequest{}
+	mi := &file_users_v1_users_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UsersExistRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UsersExistRequest) ProtoMessage() {}
+
+func (x *UsersExistRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_users_v1_users_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UsersExistRequest.ProtoReflect.Descriptor instead.
+func (*UsersExistRequest) Descriptor() ([]byte, []int) {
+	return file_users_v1_users_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *UsersExistRequest) GetUserIds() []string {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
 }
 
 type UsersExistResponse struct {
@@ -2293,14 +2293,14 @@ const file_users_v1_users_proto_rawDesc = "" +
 	"\busername\x18\x02 \x01(\tH\x00R\busername\x12\x16\n" +
 	"\x05email\x18\x03 \x01(\tH\x00R\x05email\x12\x16\n" +
 	"\x05phone\x18\x04 \x01(\tH\x00R\x05phoneB\b\n" +
-	"\x06lookup\",\n" +
-	"\x12UserExistsResponse\x12\x16\n" +
-	"\x06exists\x18\x01 \x01(\bR\x06exists\".\n" +
-	"\x11UsersExistRequest\x12\x19\n" +
-	"\buser_ids\x18\x01 \x03(\tR\auserIds\"@\n" +
+	"\x06lookup\"@\n" +
 	"\rUserExistence\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x16\n" +
-	"\x06exists\x18\x02 \x01(\bR\x06exists\"C\n" +
+	"\x06exists\x18\x02 \x01(\bR\x06exists\"I\n" +
+	"\x12UserExistsResponse\x123\n" +
+	"\bresponse\x18\x01 \x01(\v2\x17.users.v1.UserExistenceR\bresponse\".\n" +
+	"\x11UsersExistRequest\x12\x19\n" +
+	"\buser_ids\x18\x01 \x03(\tR\auserIds\"C\n" +
 	"\x12UsersExistResponse\x12-\n" +
 	"\x05users\x18\x01 \x03(\v2\x17.users.v1.UserExistenceR\x05users\"4\n" +
 	"\x19GetPrivacySettingsRequest\x12\x17\n" +
@@ -2398,9 +2398,9 @@ var file_users_v1_users_proto_goTypes = []any{
 	(*SearchUsersRequest)(nil),            // 25: users.v1.SearchUsersRequest
 	(*SearchUsersResponse)(nil),           // 26: users.v1.SearchUsersResponse
 	(*UserExistsRequest)(nil),             // 27: users.v1.UserExistsRequest
-	(*UserExistsResponse)(nil),            // 28: users.v1.UserExistsResponse
-	(*UsersExistRequest)(nil),             // 29: users.v1.UsersExistRequest
-	(*UserExistence)(nil),                 // 30: users.v1.UserExistence
+	(*UserExistence)(nil),                 // 28: users.v1.UserExistence
+	(*UserExistsResponse)(nil),            // 29: users.v1.UserExistsResponse
+	(*UsersExistRequest)(nil),             // 30: users.v1.UsersExistRequest
 	(*UsersExistResponse)(nil),            // 31: users.v1.UsersExistResponse
 	(*GetPrivacySettingsRequest)(nil),     // 32: users.v1.GetPrivacySettingsRequest
 	(*GetPrivacySettingsResponse)(nil),    // 33: users.v1.GetPrivacySettingsResponse
@@ -2429,49 +2429,50 @@ var file_users_v1_users_proto_depIdxs = []int32{
 	3,  // 16: users.v1.GetUserSummaryResponse.user:type_name -> users.v1.UserSummary
 	3,  // 17: users.v1.GetUsersSummaryResponse.users:type_name -> users.v1.UserSummary
 	3,  // 18: users.v1.SearchUsersResponse.users:type_name -> users.v1.UserSummary
-	30, // 19: users.v1.UsersExistResponse.users:type_name -> users.v1.UserExistence
-	4,  // 20: users.v1.GetPrivacySettingsResponse.settings:type_name -> users.v1.PrivacySettings
-	37, // 21: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> google.protobuf.Int32Value
-	37, // 22: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> google.protobuf.Int32Value
-	37, // 23: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> google.protobuf.Int32Value
-	37, // 24: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> google.protobuf.Int32Value
-	5,  // 25: users.v1.UsersService.CreateUser:input_type -> users.v1.CreateUserRequest
-	7,  // 26: users.v1.UsersService.RegisterContact:input_type -> users.v1.RegisterContactRequest
-	11, // 27: users.v1.UsersService.UpdateUser:input_type -> users.v1.UpdateUserRequest
-	9,  // 28: users.v1.UsersService.VerifyEmail:input_type -> users.v1.VerifyContactRequest
-	9,  // 29: users.v1.UsersService.VerifyPhone:input_type -> users.v1.VerifyContactRequest
-	13, // 30: users.v1.UsersService.DeleteUser:input_type -> users.v1.DeleteUserRequest
-	15, // 31: users.v1.UsersService.RestoreUser:input_type -> users.v1.RestoreUserRequest
-	17, // 32: users.v1.UsersService.GetUser:input_type -> users.v1.GetUserRequest
-	19, // 33: users.v1.UsersService.GetUsers:input_type -> users.v1.GetUsersRequest
-	21, // 34: users.v1.UsersService.GetUserSummary:input_type -> users.v1.GetUserSummaryRequest
-	23, // 35: users.v1.UsersService.GetUsersSummary:input_type -> users.v1.GetUsersSummaryRequest
-	25, // 36: users.v1.UsersService.SearchUsers:input_type -> users.v1.SearchUsersRequest
-	27, // 37: users.v1.UsersService.UserExists:input_type -> users.v1.UserExistsRequest
-	29, // 38: users.v1.UsersService.UsersExist:input_type -> users.v1.UsersExistRequest
-	32, // 39: users.v1.UsersService.GetPrivacySettings:input_type -> users.v1.GetPrivacySettingsRequest
-	34, // 40: users.v1.UsersService.UpdatePrivacySettings:input_type -> users.v1.UpdatePrivacySettingsRequest
-	6,  // 41: users.v1.UsersService.CreateUser:output_type -> users.v1.CreateUserResponse
-	8,  // 42: users.v1.UsersService.RegisterContact:output_type -> users.v1.RegisterContactResponse
-	12, // 43: users.v1.UsersService.UpdateUser:output_type -> users.v1.UpdateUserResponse
-	10, // 44: users.v1.UsersService.VerifyEmail:output_type -> users.v1.VerifyContactResponse
-	10, // 45: users.v1.UsersService.VerifyPhone:output_type -> users.v1.VerifyContactResponse
-	14, // 46: users.v1.UsersService.DeleteUser:output_type -> users.v1.DeleteUserResponse
-	16, // 47: users.v1.UsersService.RestoreUser:output_type -> users.v1.RestoreUserResponse
-	18, // 48: users.v1.UsersService.GetUser:output_type -> users.v1.GetUserResponse
-	20, // 49: users.v1.UsersService.GetUsers:output_type -> users.v1.GetUsersResponse
-	22, // 50: users.v1.UsersService.GetUserSummary:output_type -> users.v1.GetUserSummaryResponse
-	24, // 51: users.v1.UsersService.GetUsersSummary:output_type -> users.v1.GetUsersSummaryResponse
-	26, // 52: users.v1.UsersService.SearchUsers:output_type -> users.v1.SearchUsersResponse
-	28, // 53: users.v1.UsersService.UserExists:output_type -> users.v1.UserExistsResponse
-	31, // 54: users.v1.UsersService.UsersExist:output_type -> users.v1.UsersExistResponse
-	33, // 55: users.v1.UsersService.GetPrivacySettings:output_type -> users.v1.GetPrivacySettingsResponse
-	35, // 56: users.v1.UsersService.UpdatePrivacySettings:output_type -> users.v1.UpdatePrivacySettingsResponse
-	41, // [41:57] is the sub-list for method output_type
-	25, // [25:41] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	28, // 19: users.v1.UserExistsResponse.response:type_name -> users.v1.UserExistence
+	28, // 20: users.v1.UsersExistResponse.users:type_name -> users.v1.UserExistence
+	4,  // 21: users.v1.GetPrivacySettingsResponse.settings:type_name -> users.v1.PrivacySettings
+	37, // 22: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> google.protobuf.Int32Value
+	37, // 23: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> google.protobuf.Int32Value
+	37, // 24: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> google.protobuf.Int32Value
+	37, // 25: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> google.protobuf.Int32Value
+	5,  // 26: users.v1.UsersService.CreateUser:input_type -> users.v1.CreateUserRequest
+	7,  // 27: users.v1.UsersService.RegisterContact:input_type -> users.v1.RegisterContactRequest
+	11, // 28: users.v1.UsersService.UpdateUser:input_type -> users.v1.UpdateUserRequest
+	9,  // 29: users.v1.UsersService.VerifyEmail:input_type -> users.v1.VerifyContactRequest
+	9,  // 30: users.v1.UsersService.VerifyPhone:input_type -> users.v1.VerifyContactRequest
+	13, // 31: users.v1.UsersService.DeleteUser:input_type -> users.v1.DeleteUserRequest
+	15, // 32: users.v1.UsersService.RestoreUser:input_type -> users.v1.RestoreUserRequest
+	17, // 33: users.v1.UsersService.GetUser:input_type -> users.v1.GetUserRequest
+	19, // 34: users.v1.UsersService.GetUsers:input_type -> users.v1.GetUsersRequest
+	21, // 35: users.v1.UsersService.GetUserSummary:input_type -> users.v1.GetUserSummaryRequest
+	23, // 36: users.v1.UsersService.GetUsersSummary:input_type -> users.v1.GetUsersSummaryRequest
+	25, // 37: users.v1.UsersService.SearchUsers:input_type -> users.v1.SearchUsersRequest
+	27, // 38: users.v1.UsersService.UserExists:input_type -> users.v1.UserExistsRequest
+	30, // 39: users.v1.UsersService.UsersExist:input_type -> users.v1.UsersExistRequest
+	32, // 40: users.v1.UsersService.GetPrivacySettings:input_type -> users.v1.GetPrivacySettingsRequest
+	34, // 41: users.v1.UsersService.UpdatePrivacySettings:input_type -> users.v1.UpdatePrivacySettingsRequest
+	6,  // 42: users.v1.UsersService.CreateUser:output_type -> users.v1.CreateUserResponse
+	8,  // 43: users.v1.UsersService.RegisterContact:output_type -> users.v1.RegisterContactResponse
+	12, // 44: users.v1.UsersService.UpdateUser:output_type -> users.v1.UpdateUserResponse
+	10, // 45: users.v1.UsersService.VerifyEmail:output_type -> users.v1.VerifyContactResponse
+	10, // 46: users.v1.UsersService.VerifyPhone:output_type -> users.v1.VerifyContactResponse
+	14, // 47: users.v1.UsersService.DeleteUser:output_type -> users.v1.DeleteUserResponse
+	16, // 48: users.v1.UsersService.RestoreUser:output_type -> users.v1.RestoreUserResponse
+	18, // 49: users.v1.UsersService.GetUser:output_type -> users.v1.GetUserResponse
+	20, // 50: users.v1.UsersService.GetUsers:output_type -> users.v1.GetUsersResponse
+	22, // 51: users.v1.UsersService.GetUserSummary:output_type -> users.v1.GetUserSummaryResponse
+	24, // 52: users.v1.UsersService.GetUsersSummary:output_type -> users.v1.GetUsersSummaryResponse
+	26, // 53: users.v1.UsersService.SearchUsers:output_type -> users.v1.SearchUsersResponse
+	29, // 54: users.v1.UsersService.UserExists:output_type -> users.v1.UserExistsResponse
+	31, // 55: users.v1.UsersService.UsersExist:output_type -> users.v1.UsersExistResponse
+	33, // 56: users.v1.UsersService.GetPrivacySettings:output_type -> users.v1.GetPrivacySettingsResponse
+	35, // 57: users.v1.UsersService.UpdatePrivacySettings:output_type -> users.v1.UpdatePrivacySettingsResponse
+	42, // [42:58] is the sub-list for method output_type
+	26, // [26:42] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_users_v1_users_proto_init() }
