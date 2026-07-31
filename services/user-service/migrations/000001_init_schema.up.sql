@@ -9,9 +9,6 @@ CREATE TABLE users (
     bio TEXT DEFAULT '',
     display_name TEXT,
 
-    email_verified TIMESTAMP NULL,
-    phone_verified TIMESTAMP NULL,
-
     birth_date DATE NULL,
 
     bio_status TEXT DEFAULT '',

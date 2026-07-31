@@ -7,61 +7,40 @@ sequenceDiagram
     participant Client
     participant Gateway as API Gateway
     participant Auth as Auth Service
-    participant OTP as OTP Service
+    participant AuthCache as Auth Cache
     participant User as User Service
     participant UserDB as User Database
     participant Kafka
-    participant Search as Search Service
-    participant Social as Social Graph Service
-    participant Posts as Posts Service
-    participant Chat as Chat Service
-    participant Notification as Notification Service
+    participant Email as Email Service
+    participant SMS as SMS Service
 
-    alt Delete User
+    %% --- DELETE USER REQUEST ---
+    Client->>Gateway: Submit DeleteUser request (REST API)
+    Gateway->>Auth: DeleteUser request
 
-        Client->>Gateway: Request account deletion
-        Gateway->>Auth: DeleteAccount()
+    %% --- USER EXISTENCE CHECK ---
+    Auth->>User: gRPC CheckUserExists(userId)
+    User->>UserDB: Query user record
+    UserDB-->>User: Return user status
+    User-->>Auth: User existence status
 
-        Auth->>OTP: Send OTP
-        OTP-->>Client: Deliver OTP
+    alt User exists
+        Note over Auth: Generate OTP
 
-        Client->>Gateway: Submit OTP
-        Gateway->>Auth: Verify OTP
+        Auth->>AuthCache: Store OTP_Transaction (action = "delete")
+        AuthCache-->>Auth: Confirmation
 
-        Auth->>OTP: Validate OTP
+        Auth->>Kafka: Publish SendEmail / SendSMS event
+        Kafka-->>Email: Consume event & send OTP message
+        Kafka-->>SMS: Consume event & send OTP message
 
-        alt Invalid OTP
-            OTP-->>Auth: Invalid
-            Auth-->>Gateway: OTP verification failed
-            Gateway-->>Client: 401 Unauthorized
-
-        else OTP Valid
-
-            Auth->>User: DeleteUser(userId)
-
-            User->>UserDB: Soft delete user
-
-            User->>Kafka: Publish UserDeleted
-
-            par Search Service
-                Kafka-->>Search: UserDeleted
-                Search->>Search: Remove user from index
-            and Social Graph Service
-                Kafka-->>Social: UserDeleted
-                Social->>Social: Hide profile
-            and Posts Service
-                Kafka-->>Posts: UserDeleted
-                Posts->>Posts: Hide author's content
-            and Chat Service
-                Kafka-->>Chat: UserDeleted
-                Chat->>Chat: Update cached user state
-            and Notification Service
-                Kafka-->>Notification: UserDeleted
-            end
-
-            User-->>Gateway: Account deleted
-            Gateway-->>Client: 200 OK
-        end
-
+    else User does not exist
+        Note over Auth: Execute dummy delay<br/>(Prevents timing attacks)
     end
+
+    %% --- UNIFORM RESPONSE ---
+    Auth-->>Gateway: 200 OK (Email sent)
+    Gateway-->>Client: 200 OK (Email sent)
+
+    Note over Client, SMS: The rest is completed in the OTP verification process.
 ```

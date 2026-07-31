@@ -11,13 +11,22 @@ import (
 )
 
 func mapCreateUserRequestToDomain(req *pb.CreateUserRequest) *domain.User {
+
+	email := ""
+	phone := ""
+
+	switch lookup := req.Contact.(type) {
+	case *pb.CreateUserRequest_Email:
+		email = lookup.Email
+	case *pb.CreateUserRequest_Phone:
+		phone = lookup.Phone
+	}
+
 	return &domain.User{
-		Username:       req.Username,
-		Email:          req.Email,
-		PhoneNumber:    req.Phone,
-		DisplayName:    req.DisplayName,
-		EmailVerified:  time.Time{},
-		PhoneVerified:  time.Time{},
+		Username:       "",
+		Email:          email,
+		PhoneNumber:    phone,
+		DisplayName:    "",
 		BirthDate:      time.Time{},
 		BioStatus:      "",
 		AccountBadge:   domain.UNVERIFIED,
@@ -122,8 +131,6 @@ func mapUserToProto(user *domain.User) *pb.User {
 		Email:          user.Email,
 		Phone:          user.PhoneNumber,
 		DisplayName:    user.DisplayName,
-		EmailVerified:  mapTimeToProto(user.EmailVerified),
-		PhoneVerified:  mapTimeToProto(user.PhoneVerified),
 		BirthDate:      mapTimeToProto(user.BirthDate),
 		BioStatus:      user.BioStatus,
 		AccountBadge:   mapAccountBadgeToProto(user.AccountBadge),

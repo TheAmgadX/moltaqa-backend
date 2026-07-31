@@ -19,65 +19,67 @@ sequenceDiagram
 
     %% --- OTP VERIFICATION REQUEST ---
     Client->>Gateway: Submit OTP verification request (REST API)
-    Gateway->>Auth: VerifyOTP(userId/email/phone, otp)
+    Gateway->>Auth: VerifyOTP(phone/email, otp)
 
-    alt Invalid OTP
+    %% --- OTP & TRANSACTION VALIDATION ---
+    Auth->>AuthCache: Get OTP_Transaction by key (email/phone)
+    AuthCache-->>Auth: Return OTP_Transaction {email/phone, action}
+
+    alt Invalid OTP or Transaction Expired
         Auth-->>Gateway: OTP verification failed
         Gateway-->>Client: 401 Unauthorized
     else Valid OTP
 
-        %% --- CACHED USERS EVALUATION ---
-        alt User IS in cached users
-            Auth->>AuthCache: Check cached users
-            AuthCache-->>Auth: User found with flag
+        %% --- STATE MACHINE: ACTION EXECUTION ---
+        alt Action == "Login" / "Register"
+            Auth->>User: gRPC CheckUserExists(phone/email)
+            User->>UserDB: Query user record
+            UserDB-->>User: User existence status
+            User-->>Auth: User exists boolean
 
-            alt Flag == "login"
-                Note over Auth: Do nothing (standard authentication flow)
-
-            else Flag == "restore"
-                Auth->>User: gRPC RestoreUser(userId)
-                User->>UserDB: Restore user record
-                User->>Kafka: Publish UserRestored
-
-                par Downstream Service Sync (Restore)
-                    Kafka-->>Search: UserRestored (Re-index user)
-                and
-                    Kafka-->>Social: UserRestored (Restore profile visibility)
-                and
-                    Kafka-->>Posts: UserRestored (Restore author's content)
-                and
-                    Kafka-->>Chat: UserRestored (Refresh cached user state)
-                and
-                    Kafka-->>Notification: UserRestored
-                end
-
-            else Flag == "delete"
-                Auth->>User: gRPC DeleteUser(userId)
-                User->>UserDB: Delete/Soft-delete user record
-                User->>Kafka: Publish UserDeleted
-
-                par Downstream Service Sync (Delete)
-                    Kafka-->>Search: UserDeleted (Remove user from index)
-                and
-                    Kafka-->>Social: UserDeleted (Hide profile)
-                and
-                    Kafka-->>Posts: UserDeleted (Hide author's content)
-                and
-                    Kafka-->>Chat: UserDeleted (Update cached user state)
-                and
-                    Kafka-->>Notification: UserDeleted
-                end
+            alt User does not exist
+                Auth->>User: gRPC CreateUser(phone/email)
+                User->>UserDB: Insert user record
+                User-->>Auth: User created successfully
             end
 
-        else User NOT in cached users
-            Auth->>AuthCache: Check cached users
-            AuthCache-->>Auth: User not found
-            Auth->>User: gRPC VerifyUser(userId)
-            User->>UserDB: Update user status to verified
-            User-->>Auth: User verified successfully
+        else Action == "Restore"
+            Auth->>User: gRPC RestoreUser(userId)
+            User->>UserDB: Restore user record
+            User->>Kafka: Publish UserRestored
+
+            par Downstream Service Sync (Restore)
+                Kafka-->>Search: UserRestored (Re-index user)
+            and
+                Kafka-->>Social: UserRestored (Restore profile visibility)
+            and
+                Kafka-->>Posts: UserRestored (Restore author's content)
+            and
+                Kafka-->>Chat: UserRestored (Refresh cached user state)
+            and
+                Kafka-->>Notification: UserRestored
+            end
+
+        else Action == "Delete"
+            Auth->>User: gRPC DeleteUser(userId)
+            User->>UserDB: Delete/Soft-delete user record
+            User->>Kafka: Publish UserDeleted
+
+            par Downstream Service Sync (Delete)
+                Kafka-->>Search: UserDeleted (Remove user from index)
+            and
+                Kafka-->>Social: UserDeleted (Hide profile)
+            and
+                Kafka-->>Posts: UserDeleted (Hide author's content)
+            and
+                Kafka-->>Chat: UserDeleted (Update cached user state)
+            and
+                Kafka-->>Notification: UserDeleted
+            end
         end
 
-        %% --- FINAL RESPONSE & TOKEN ISSUANCE ---
+        %% --- TRANSACTION CLEANUP & TOKEN ISSUANCE ---
+        Auth->>AuthCache: Invalidate/Delete OTP_Transaction
         Auth-->>Gateway: Return JWT Token & Operation Status
         Gateway-->>Client: 200 OK (JWT Token)
     end

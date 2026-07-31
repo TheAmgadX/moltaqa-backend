@@ -278,8 +278,7 @@ func mapDBRowToUser(rows *pgx.Rows) (*domain.User, error) {
 
 	if (*rows).Next() {
 		err := (*rows).Scan(&user.Id, &user.Username, &user.PhoneNumber,
-			&user.Email, &user.ProfileImageUrl, &user.Bio, &user.DisplayName,
-			&user.EmailVerified, &user.PhoneVerified, &user.BirthDate,
+			&user.Email, &user.ProfileImageUrl, &user.Bio, &user.DisplayName, &user.BirthDate,
 			&user.BioStatus, &user.AccountBadge, &user.FriendsCount,
 			&user.FollowersCount, &user.FollowingCount, &user.PostsCount,
 			&user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)

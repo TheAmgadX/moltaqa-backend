@@ -7,35 +7,40 @@ sequenceDiagram
     participant Client
     participant Gateway as API Gateway
     participant Auth as Auth Service
-    participant AuthCache as Auth Cache
     participant UserDB as User Database
+    participant AuthCache as Auth Cache
+    participant Kafka as Message Broker (Kafka)
     participant EmailSMS as Email / SMS Service
-    participant Kafka
 
-    %% --- RESTORE USER INITIAL REQUEST ---
-    Client->>Gateway: Request account restoration (REST API: email/phone)
-    Gateway->>Auth: RestoreAccount(email/phone)
+    %% --- RESTORE USER REQUEST ---
+    Client->>Gateway: Request account restoration (email / phone)
+    Gateway->>Auth: RestoreUser(email / phone)
 
     Auth->>UserDB: Check if user exists in DB
 
-    alt User does not exist
-        UserDB-->>Auth: User not found
-        Auth-->>Gateway: User does not exist
-        Gateway-->>Client: 404 Not Found
-    else User exists
+    alt User exists
         UserDB-->>Auth: User found
 
-        Auth->>AuthCache: Store user in cached users (flag = "restore")
+        %% 1. Generate & Store OTP
+        Auth->>AuthCache: Generate OTP & Store OTP_Transaction
 
-        Auth->>EmailSMS: Trigger Email / SMS Service
-        EmailSMS-->>Client: Deliver OTP
+        %% 2. Asynchronously Publish Event
+        Auth->>Kafka: Publish `SendEmail` / `SendSMS` event
 
-        EmailSMS->>Kafka: Publish RestoreAccountEmailSent
-        Kafka-->>Auth: Consume RestoreAccountEmailSent (Get OTP & store in cache)
+        %% 3. Consumer handles delivery
+        Kafka->>EmailSMS: Consume `SendEmail` / `SendSMS` event
+        EmailSMS-->>Client: Deliver Email / SMS with OTP
 
-        Auth-->>Gateway: Restoration request received & OTP sent
-        Gateway-->>Client: 200 OK (OTP sent)
+    else User does not exist
+        UserDB-->>Auth: User not found
 
-        Note over Client, Kafka: The rest of the workflow (account restoration & event publishing) occurs during the standalone OTP Verification Process.
+        %% Security: Do not reveal account status
+        Note over Auth: Silently skip OTP generation & event publishing<br/>(Apply dummy delay to prevent timing attacks)
     end
+
+    %% Unified Secure Response
+    Auth-->>Gateway: 200 OK ("If account exists, an OTP has been sent.")
+    Gateway-->>Client: 200 OK ("If account exists, an OTP has been sent.")
+
+    Note over Client, EmailSMS: The rest is done during the standalone OTP verification process.
 ```
