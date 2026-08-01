@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-auth-service
+  labels:
+    app: redis-auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-auth-service
+  template:
+    metadata:
+      labels:
+        app: redis-auth-service
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-auth-service
+  labels:
+    app: redis-auth-service
+spec:
+  selector:
+    app: redis-auth-service
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+      protocol: TCP

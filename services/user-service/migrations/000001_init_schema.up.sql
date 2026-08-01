@@ -36,6 +36,8 @@ CREATE TABLE users (
     deleted_at TIMESTAMP NULL
 );
 
+CREATE INDEX idx_users_display_name ON users(display_name);
+
 CREATE TABLE privacy_settings (
     user_id UUID PRIMARY KEY,
 

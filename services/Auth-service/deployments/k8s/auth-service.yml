@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: auth-service
+
+  template:
+    metadata:
+      labels:
+        app: auth-service
+
+    spec:
+      containers:
+        - name: auth-service
+          image: auth-service
+          imagePullPolicy: Never
+
+          ports:
+            - name: grpc
+              containerPort: 50051
+              protocol: TCP
+
+          env:
+            - name: GRPC_PORT
+              value: "50051"
+
+            # Database connection details
+            - name: DB_HOST
+              value: "postgres-auth-service"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: POSTGRES_DB
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: POSTGRES_PASSWORD
+
+            # Redis connection details (OTP transaction cache)
+            - name: REDIS_HOST
+              value: "redis-auth-service"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+
+            # Kafka connection details (SendEmail / SendSMS events)
+            - name: KAFKA_BROKERS
+              value: "kafka:9092"
+
+            # JWT signing key (access tokens)
+            - name: JWT_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auth-jwt-secret
+                  key: JWT_SIGNING_KEY
+
+            # Downstream service address
+            - name: USER_SERVICE_ADDR
+              value: "user-service:50051"
+
+          livenessProbe:
+            grpc:
+              port: 50051
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          readinessProbe:
+            grpc:
+              port: 50051
+            initialDelaySeconds: 3
+            periodSeconds: 5
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: auth-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: auth-service
+
+  ports:
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+      appProtocol: grpc
