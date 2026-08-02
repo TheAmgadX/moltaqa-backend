@@ -10,11 +10,11 @@ import (
 	"syscall"
 	"time"
 
-	//Auth_grpc "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/grpc"
-	//repository "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/repository/postgres"
-	//"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/service"
+	Auth_grpc "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/grpc"
+	repository "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/repository/postgres"
+	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/service"
 	"github.com/TheAmgadX/moltaqa-backend/shared/env"
-	//pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
+	pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
 	"google.golang.org/grpc"
 )
 
@@ -40,22 +40,19 @@ func createServer(port string) (*grpc.Server, *net.Listener, error) {
 
 	grpc_server := grpc.NewServer()
 
-	/*
-		repo, err := repository.NewUserPostgresRepository(build_DB_DSN())
+	repo, err := repository.NewAuthPostgresRepository(build_DB_DSN())
+	if err != nil {
+		log.Printf("failed to create repository: %v\n", err)
+		return nil, nil, err
+	}
 
-		if err != nil {
-			log.Printf("failed to create repository: %v\n", err)
-			return nil, nil, err
-		}
+	service, err := service.NewService(repo)
+	if err != nil {
+		log.Printf("failed to create service: %v\n", err)
+		return nil, nil, err
+	}
 
-		service, err := service.NewService(repo)
-
-		if err != nil {
-			log.Printf("failed to create service: %v\n", err)
-			return nil, nil, err
-		}
-		pb.RegisterAuthServiceServer(grpc_server, Auth_grpc.NewAuthGRPCServer(service))
-	*/
+	pb.RegisterAuthServiceServer(grpc_server, Auth_grpc.NewAuthGRPCServer(service))
 
 	return grpc_server, &lis, nil
 }

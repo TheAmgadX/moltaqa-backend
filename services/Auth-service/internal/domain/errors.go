@@ -9,10 +9,6 @@ var (
 	ErrOTPMaxAttemptsExceeded = errors.New("otp max attempts exceeded")
 	ErrOTPResendCooldown      = errors.New("otp resend cooldown active")
 
-	ErrSessionNotFound = errors.New("session not found")
-	ErrSessionRevoked  = errors.New("session revoked")
-	ErrSessionExpired  = errors.New("session expired")
-
 	ErrRefreshTokenNotFound = errors.New("refresh token not found")
 	ErrRefreshTokenExpired  = errors.New("refresh token expired")
 	ErrRefreshTokenInvalid  = errors.New("invalid refresh token")
