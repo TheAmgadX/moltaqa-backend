@@ -14,10 +14,6 @@ service UsersService {
 
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
 
-  rpc VerifyEmail(VerifyContactRequest) returns (VerifyContactResponse);
-
-  rpc VerifyPhone(VerifyContactRequest) returns (VerifyContactResponse);
-
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
 
   rpc RestoreUser(RestoreUserRequest) returns (RestoreUserResponse);
@@ -72,25 +68,21 @@ message User {
 
   string bio_status = 8;
 
-  google.protobuf.Timestamp email_verified = 9;
+  AccountBadge account_badge = 9;
 
-  google.protobuf.Timestamp phone_verified = 10;
+  uint32 friends_count = 10;
 
-  AccountBadge account_badge = 11;
+  uint32 followers_count = 11;
 
-  uint32 friends_count = 12;
+  uint32 following_count = 12;
 
-  uint32 followers_count = 13;
+  uint32 posts_count = 13;
 
-  uint32 following_count = 14;
+  google.protobuf.Timestamp birth_date = 14;
 
-  uint32 posts_count = 15;
+  google.protobuf.Timestamp created_at = 15;
 
-  google.protobuf.Timestamp birth_date = 16;
-
-  google.protobuf.Timestamp created_at = 17;
-
-  google.protobuf.Timestamp updated_at = 18;
+  google.protobuf.Timestamp updated_at = 16;
 }
 
 message UserSummary {
@@ -122,15 +114,10 @@ message PrivacySettings {
 }
 
 message CreateUserRequest {
-  string id = 1;
-
-  string username = 2;
-
-  string email = 3;
-
-  string phone = 4;
-
-  string display_name = 5;
+  oneof contact {
+    string email = 1;
+    string phone = 2;
+  }
 }
 
 message CreateUserResponse {
@@ -147,36 +134,30 @@ message RegisterContactRequest {
 
 message RegisterContactResponse {}
 
-message VerifyContactRequest {
-  string user_id = 1;
-}
-
-message VerifyContactResponse {}
-
 message UpdateUserRequest {
   string id = 1;
 
-  string username = 2;
+  optional string username = 2;
 
-  string display_name = 3;
+  optional string display_name = 3;
 
-  string profile_image_url = 6;
+  optional string profile_image_url = 6;
 
-  string bio = 7;
+  optional string bio = 7;
 
-  string bio_status = 8;
+  optional string bio_status = 8;
 
-  AccountBadge account_badge = 11;
+  optional AccountBadge account_badge = 11;
 
-  uint32 friends_count = 12;
+  optional uint32 friends_count = 12;
 
-  uint32 followers_count = 13;
+  optional uint32 followers_count = 13;
 
-  uint32 following_count = 14;
+  optional uint32 following_count = 14;
 
-  uint32 posts_count = 15;
+  optional uint32 posts_count = 15;
 
-  google.protobuf.Timestamp birth_date = 16;
+  optional google.protobuf.Timestamp birth_date = 16;
 }
 
 message UpdateUserResponse {}
@@ -259,18 +240,18 @@ message UserExistsRequest {
   }
 }
 
-message UserExistsResponse {
-  bool exists = 1;
-}
-
-message UsersExistRequest {
-  repeated string user_ids = 1;
-}
-
 message UserExistence {
   string user_id = 1;
 
   bool exists = 2;
+}
+
+message UserExistsResponse {
+  UserExistence response = 1;
+}
+
+message UsersExistRequest {
+  repeated string user_ids = 1;
 }
 
 message UsersExistResponse {
@@ -288,17 +269,13 @@ message GetPrivacySettingsResponse {
 message UpdatePrivacySettingsRequest {
   string user_id = 1;
 
-  google.protobuf.Int32Value avatar_visibility = 2;
+  optional Visibility avatar_visibility = 2;
+  optional Visibility phone_visibility = 3;
+  optional Visibility email_visibility = 4;
+  optional Visibility last_seen_visibility = 5;
 
-  google.protobuf.Int32Value phone_visibility = 3;
-
-  google.protobuf.Int32Value email_visibility = 4;
-
-  google.protobuf.Int32Value last_seen_visibility = 5;
-
-  bool read_receipts_enabled = 6;
-
-  bool find_by_username = 7;
+  optional bool read_receipts_enabled = 6;
+  optional bool find_by_username = 7;
 }
 
 message UpdatePrivacySettingsResponse {}

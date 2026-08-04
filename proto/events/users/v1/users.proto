@@ -2,12 +2,29 @@ syntax = "proto3";
 
 package events.users.v1;
 
-import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
+option go_package = "shared/events/users;users_events";
 
-option go_package = "shared/events/users;users-events";
-
-message UserCreated {
+message UserRegistered {
   string id = 1;
-  string username = 2;
 }
+
+message ContactRegistered {
+  string user_id = 1;
+
+  oneof contact {
+    string phone = 2;
+    string email = 3;
+  }
+}
+
+message UserUpdated {
+    string user_id = 1;
+
+    string field = 2;
+
+    string value = 3;
+}
+
+message UserDeleted {}
+
+message UserRestored {}

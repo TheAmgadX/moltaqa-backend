@@ -16,8 +16,6 @@ type UserRepository interface {
 	Create(ctx context.Context, user *domain.User) error
 	RegisterContact(ctx context.Context, user *domain.ContactRequest) error
 	Update(ctx context.Context, userUpdate *domain.UserUpdate) error
-	VerifyEmail(ctx context.Context, id string) error
-	VerifyPhone(ctx context.Context, id string) error
 	SoftDelete(ctx context.Context, id string) error
 	RestoreUser(ctx context.Context, id string) error
 
@@ -29,10 +27,10 @@ type UserRepository interface {
 	Search(ctx context.Context, user_search *domain.UserSearch) (*domain.UserSearchResult, error)
 
 	// Validation
-	Exists(ctx context.Context, lookup domain.Lookup) (bool, error)
+	Exists(ctx context.Context, lookup domain.Lookup) (string, error)
 	UsersExist(ctx context.Context, ids []string) ([]domain.UserExistence, error)
 
 	// Privacy Settings
 	GetPrivacySettings(ctx context.Context, id string) (*domain.PrivacySettings, error)
-	UpdatePrivacySettings(ctx context.Context, id string, settingsUpdate *domain.PrivacySettingsUpdate) error
+	UpdatePrivacySettings(ctx context.Context, settingsUpdate *domain.PrivacySettingsUpdate) error
 }

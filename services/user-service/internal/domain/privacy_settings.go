@@ -11,6 +11,15 @@ const (
 	NOBODY   Visibility = "nobody"
 )
 
+func (v Visibility) IsValid() bool {
+	switch v {
+	case EVERYONE, FRIENDS, CONTACTS, NOBODY:
+		return true
+	default:
+		return false
+	}
+}
+
 type PrivacySettings struct {
 	UserId              uuid.UUID
 	AvatarVisibility    Visibility

@@ -4,11 +4,20 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/domain"
 	utils_postgres "github.com/TheAmgadX/moltaqa-backend/shared/utils/postgres"
 	"github.com/jackc/pgx/v5"
 )
+
+func nullIfZeroTime(time time.Time) any {
+	if time.IsZero() {
+		return nil
+	}
+
+	return time
+}
 
 func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) error {
 	if user == nil {
@@ -54,7 +63,7 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		);
 	`
 
-	_, err = r.db.Exec(
+	_, err = tx.Exec(
 		ctx,
 		query,
 		user.Id,
@@ -62,7 +71,7 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		user.Email,
 		user.PhoneNumber,
 		user.DisplayName,
-		user.BirthDate,
+		nullIfZeroTime(user.BirthDate),
 		user.Bio,
 		user.BioStatus,
 	)
@@ -74,14 +83,14 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 	// add the privacy settings row with default values
 	query = `
 		INSERT INTO privacy_settings (
-			user_id,
+			user_id
 		)
 		VALUES (
 		    $1
 		)
 	`
 
-	_, err = r.db.Exec(
+	_, err = tx.Exec(
 		ctx,
 		query,
 		user.Id,
@@ -101,22 +110,26 @@ func (r *UserPostgresRepository) RegisterContact(ctx context.Context, contact *d
 		UPDATE users
 		SET
 			%s = $1
-		WHERE user_id = $2
+		WHERE id = $2
 	`, contact.TypeString())
 
 	if contact.UserId == "" {
-		return domain.ErrInvalidUserId
+		return utils_postgres.ErrInvalidInput
 	}
 
-	_, err := r.db.Exec(
+	commandTag, err := r.db.Exec(
 		ctx,
 		query,
-		contact.UserId,
 		contact.Value(),
+		contact.UserId,
 	)
 
 	if err != nil {
 		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return utils_postgres.ErrNotFound
 	}
 
 	return nil
@@ -197,7 +210,7 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	}
 
 	if len(sets) == 0 {
-		return domain.ErrNothingToUpdate
+		return utils_postgres.ErrInvalidInput
 	}
 
 	sets = append(sets, "updated_at = NOW()")
@@ -217,30 +230,6 @@ func (r *UserPostgresRepository) Update(ctx context.Context, userUpdate *domain.
 	return utils_postgres.MapDBErrorToServiceError(err)
 }
 
-func (r *UserPostgresRepository) VerifyEmail(ctx context.Context, id string) error {
-	query := `
-		UPDATE users
-		SET email_verified = NOW()
-		WHERE id = $1;
-	`
-
-	_, err := r.db.Exec(ctx, query, id)
-
-	return utils_postgres.MapDBErrorToServiceError(err)
-}
-
-func (r *UserPostgresRepository) VerifyPhone(ctx context.Context, id string) error {
-	query := `
-		UPDATE users
-		SET phone_verified = NOW()
-		WHERE id = $1;
-	`
-
-	_, err := r.db.Exec(ctx, query, id)
-
-	return utils_postgres.MapDBErrorToServiceError(err)
-}
-
 func (r *UserPostgresRepository) SoftDelete(ctx context.Context, id string) error {
 	query := `
 		UPDATE users
@@ -249,12 +238,20 @@ func (r *UserPostgresRepository) SoftDelete(ctx context.Context, id string) erro
 	`
 
 	if id == "" {
-		return domain.ErrInvalidUserId
+		return utils_postgres.ErrInvalidInput
 	}
 
-	_, err := r.db.Exec(ctx, query, id)
+	commandTag, err := r.db.Exec(ctx, query, id)
 
-	return utils_postgres.MapDBErrorToServiceError(err)
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return utils_postgres.ErrNotFound
+	}
+
+	return nil
 }
 
 func (r *UserPostgresRepository) RestoreUser(ctx context.Context, id string) error {
@@ -265,28 +262,33 @@ func (r *UserPostgresRepository) RestoreUser(ctx context.Context, id string) err
 	`
 
 	if id == "" {
-		return domain.ErrInvalidUserId
+		return utils_postgres.ErrInvalidInput
 	}
 
-	_, err := r.db.Exec(ctx, query, id)
+	commandTag, err := r.db.Exec(ctx, query, id)
 
-	return utils_postgres.MapDBErrorToServiceError(err)
+	if err != nil {
+		return utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return utils_postgres.ErrNotFound
+	}
+
+	return nil
 }
 
 func mapDBRowToUser(rows *pgx.Rows) (*domain.User, error) {
 	var user domain.User
 
-	if (*rows).Next() {
-		err := (*rows).Scan(&user.Id, &user.Username, &user.PhoneNumber,
-			&user.Email, &user.ProfileImageUrl, &user.Bio, &user.DisplayName,
-			&user.EmailVerified, &user.PhoneVerified, &user.BirthDate,
-			&user.BioStatus, &user.AccountBadge, &user.FriendsCount,
-			&user.FollowersCount, &user.FollowingCount, &user.PostsCount,
-			&user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+	err := (*rows).Scan(&user.Id, &user.Username, &user.PhoneNumber,
+		&user.Email, &user.ProfileImageUrl, &user.Bio, &user.DisplayName, &user.BirthDate,
+		&user.BioStatus, &user.AccountBadge, &user.FriendsCount,
+		&user.FollowersCount, &user.FollowingCount, &user.PostsCount,
+		&user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	return &user, nil
@@ -307,7 +309,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 	defer rows.Close()
 
 	if !rows.Next() {
-		return nil, domain.ErrUserNotFound
+		return nil, utils_postgres.ErrNotFound
 	}
 
 	user, err := mapDBRowToUser(&rows)
@@ -321,7 +323,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 
 func (r *UserPostgresRepository) GetUsers(ctx context.Context, ids []string) ([]domain.User, error) {
 	if len(ids) == 0 {
-		return nil, domain.ErrEmptyUserIdSlice
+		return nil, utils_postgres.ErrInvalidInput
 	}
 
 	query := `
@@ -361,7 +363,7 @@ func (r *UserPostgresRepository) GetUsers(ctx context.Context, ids []string) ([]
 // warning: this should be updated whenever the user summary fields change.
 func getUserSummaryFieldsString() []string {
 	return []string{
-		"id", "username", "display_name", "phone_number", "profile_image_url", "profile_badge",
+		"id", "username", "display_name", "phone", "profile_image_url", "account_badge",
 	}
 }
 
@@ -378,7 +380,7 @@ func mapDBRowToUserSummary(rows *pgx.Rows) (*domain.UserSummary, error) {
 
 func (r *UserPostgresRepository) GetSummary(ctx context.Context, id string) (*domain.UserSummary, error) {
 	if id == "" {
-		return nil, domain.ErrInvalidUserId
+		return nil, utils_postgres.ErrInvalidInput
 	}
 
 	query := `
@@ -416,7 +418,7 @@ func (r *UserPostgresRepository) GetSummaries(ctx context.Context, ids []string)
 	query := `
 		SELECT ` + strings.Join(getUserSummaryFieldsString(), ", ") + `
 		FROM users
-		WHERE id ANY ($1)
+		WHERE id = ANY ($1)
 	`
 
 	rows, err := r.db.Query(ctx, query, ids)
@@ -438,6 +440,10 @@ func (r *UserPostgresRepository) GetSummaries(ctx context.Context, ids []string)
 		users = append(users, *user)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, utils_postgres.MapDBErrorToServiceError(err)
+	}
+
 	return users, nil
 }
 
@@ -455,21 +461,21 @@ func (r *UserPostgresRepository) Search(ctx context.Context, user_search *domain
 	offset := (user_search.Page - 1) * user_search.PageSize
 	search := "%" + user_search.Query + "%"
 
-	// Second query to fetch paginated results
-	rows, err := r.db.Query(ctx, `
-		SELECT u.*
-		FROM users u
-		JOIN privacy_settings ps
-		    ON ps.user_id = u.id
-		WHERE ps.find_by_username = TRUE
-		  AND (
-		      u.username ILIKE $1
-		      OR u.display_name ILIKE $1
-		  )
-		ORDER BY u.username
-		LIMIT $2
-		OFFSET $3;
-	`, search, user_search.PageSize+1, offset)
+	query := `
+    SELECT u.id, u.username, u.display_name, u.phone, u.profile_image_url, u.account_badge
+    FROM users u
+    JOIN privacy_settings ps
+        ON ps.user_id = u.id
+    WHERE ps.find_by_username = TRUE
+      AND (
+          u.username ILIKE $1
+          OR u.display_name ILIKE $1
+      )
+    ORDER BY u.username
+    LIMIT $2
+    OFFSET $3;
+	`
+	rows, err := r.db.Query(ctx, query, search, user_search.PageSize+1, offset)
 
 	if err != nil {
 		return nil, utils_postgres.MapDBErrorToServiceError(err)
@@ -507,28 +513,31 @@ func (r *UserPostgresRepository) Search(ctx context.Context, user_search *domain
 }
 
 // Validation
-func (r *UserPostgresRepository) Exists(ctx context.Context, lookup domain.Lookup) (bool, error) {
+func (r *UserPostgresRepository) Exists(ctx context.Context, lookup domain.Lookup) (string, error) {
 	query := `
-		SELECT EXISTS (
-			SELECT 1
-			FROM users
-			WHERE ` + lookup.TypeString() + ` = $1
-		)
+		SELECT id
+		FROM users
+		WHERE ` + lookup.TypeString() + ` = $1
 	`
 
-	var exists bool
-	err := r.db.QueryRow(ctx, query, lookup.Value).Scan(&exists)
-
-	// default return value by .Scan if no values where found.
-	if err == pgx.ErrNoRows {
-		return false, nil
-	}
+	rows, err := r.db.Query(ctx, query, lookup.Value)
 
 	if err != nil {
-		return false, utils_postgres.MapDBErrorToServiceError(err)
+		return "", utils_postgres.MapDBErrorToServiceError(err)
 	}
 
-	return exists, nil
+	defer rows.Close()
+
+	if !rows.Next() {
+		return "", domain.ErrUserNotFound
+	}
+
+	var id string
+	if err := rows.Scan(&id); err != nil {
+		return "", utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	return id, nil
 }
 
 func (r *UserPostgresRepository) UsersExist(ctx context.Context, ids []string) ([]domain.UserExistence, error) {
@@ -537,33 +546,34 @@ func (r *UserPostgresRepository) UsersExist(ctx context.Context, ids []string) (
 	}
 
 	query := `
-		SELECT id, EXISTS (
-			SELECT 1
-			FROM users
-			WHERE id = ANY ($1)
-		)
-	`
+        SELECT id
+        FROM users
+        WHERE id = ANY($1)
+    `
 
 	rows, err := r.db.Query(ctx, query, ids)
-
 	if err != nil {
 		return nil, utils_postgres.MapDBErrorToServiceError(err)
 	}
 	defer rows.Close()
 
-	var users []domain.UserExistence
-
+	foundMap := make(map[string]bool)
 	for rows.Next() {
-		var id string
-		var exists bool
-		err := rows.Scan(&id, &exists)
-
-		if err != nil {
+		var foundID string
+		if err := rows.Scan(&foundID); err != nil {
 			return nil, utils_postgres.MapDBErrorToServiceError(err)
 		}
-
-		users = append(users, domain.NewUserExistence(id, exists))
+		foundMap[foundID] = true
 	}
 
-	return users, nil
+	if err := rows.Err(); err != nil {
+		return nil, utils_postgres.MapDBErrorToServiceError(err)
+	}
+
+	result := make([]domain.UserExistence, 0, len(ids))
+	for _, id := range ids {
+		result = append(result, domain.NewUserExistence(id, foundMap[id]))
+	}
+
+	return result, nil
 }

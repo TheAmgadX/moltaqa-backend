@@ -44,26 +44,6 @@ func (s *UserGRPCServer) RegisterContact(ctx context.Context, req *pb.RegisterCo
 	return &pb.RegisterContactResponse{}, nil
 }
 
-func (s *UserGRPCServer) VerifyEmail(ctx context.Context, req *pb.VerifyContactRequest) (*pb.VerifyContactResponse, error) {
-	err := s.service.VerifyEmail(ctx, req.UserId)
-
-	if err != nil {
-		return nil, mapServiceError(err)
-	}
-
-	return &pb.VerifyContactResponse{}, nil
-}
-
-func (s *UserGRPCServer) VerifyPhone(ctx context.Context, req *pb.VerifyContactRequest) (*pb.VerifyContactResponse, error) {
-	err := s.service.VerifyPhone(ctx, req.UserId)
-
-	if err != nil {
-		return nil, mapServiceError(err)
-	}
-
-	return &pb.VerifyContactResponse{}, nil
-}
-
 func (s *UserGRPCServer) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
 	user, err := mapUpdateUserRequestToDomain(req)
 
@@ -174,14 +154,14 @@ func (s *UserGRPCServer) UserExists(ctx context.Context, req *pb.UserExistsReque
 		return nil, mapServiceError(err)
 	}
 
-	exists, err := s.service.UserExists(ctx, lookup)
+	response, err := s.service.UserExists(ctx, lookup)
 
 	if err != nil {
 		return nil, mapServiceError(err)
 	}
 
 	return &pb.UserExistsResponse{
-		Exists: exists,
+		Response: mapUserExistanceToProto(response),
 	}, nil
 }
 
@@ -193,7 +173,7 @@ func (s *UserGRPCServer) UsersExist(ctx context.Context, req *pb.UsersExistReque
 	}
 
 	return &pb.UsersExistResponse{
-		Users: mapUserExistanceToProto(result),
+		Users: mapUsersExistanceToProto(result),
 	}, nil
 }
 
