@@ -23,7 +23,6 @@ func Topics() []string {
 	return []string{
 		UserRegistered.String(), ContactRegistered.String(),
 		UserUpdated.String(), UserDeleted.String(), UserRestored.String(),
-	,
 		AuthSendEmail.String(),
 		AuthSendSMS.String(),
 	}

@@ -75,6 +75,10 @@ func (s *OTPTransactionStore) Delete(ctx context.Context, otpTx domain.OTPTransa
 }
 
 func (s *OTPTransactionStore) cacheKey(otpTx domain.OTPTransaction) string {
+	if otpTx.OTPHash != "" {
+		return fmt.Sprintf("%s:%s", s.prefix, otpTx.OTPHash)
+	}
+
 	recipient := otpTx.Email
 	recipientType := "email"
 	if recipient == "" {
