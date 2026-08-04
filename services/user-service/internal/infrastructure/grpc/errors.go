@@ -9,6 +9,16 @@ import (
 )
 
 func mapServiceError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	var valErr *domain.ValidationError
+
+	if errors.As(err, &valErr) {
+		return status.Error(codes.InvalidArgument, valErr.Error())
+	}
+
 	switch {
 	// domain errors:
 	case errors.Is(err, domain.ErrUserNotFound):
@@ -17,14 +27,20 @@ func mapServiceError(err error) error {
 	case errors.Is(err, domain.ErrUserAlreadyExists):
 		return status.Error(codes.AlreadyExists, err.Error())
 
-	case errors.Is(err, domain.ErrInvalidUserId),
-		errors.Is(err, domain.ErrInvalidUserInput),
-		errors.Is(err, domain.ErrEmptyUserIdSlice),
-		errors.Is(err, domain.ErrNothingToUpdate):
+	case errors.Is(err, domain.ErrInvalidUserInput):
 		return status.Error(codes.InvalidArgument, err.Error())
 
-	case errors.Is(err, domain.ErrNothingToUpdate):
-		return status.Error(codes.InvalidArgument, err.Error())
+	case errors.Is(err, domain.ErrPermissionDenied):
+		return status.Error(codes.PermissionDenied, err.Error())
+
+	case errors.Is(err, domain.ErrRequestTimeout):
+		return status.Error(codes.DeadlineExceeded, err.Error())
+
+	case errors.Is(err, domain.ErrServiceUnavailable):
+		return status.Error(codes.Unavailable, err.Error())
+
+	case errors.Is(err, domain.ErrConflict):
+		return status.Error(codes.FailedPrecondition, err.Error())
 
 	default:
 		return status.Error(codes.Internal, err.Error())

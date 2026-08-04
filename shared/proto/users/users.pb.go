@@ -10,7 +10,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
+	_ "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -714,17 +714,17 @@ func (*RegisterContactResponse) Descriptor() ([]byte, []int) {
 type UpdateUserRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Username        string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	DisplayName     string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	ProfileImageUrl string                 `protobuf:"bytes,6,opt,name=profile_image_url,json=profileImageUrl,proto3" json:"profile_image_url,omitempty"`
-	Bio             string                 `protobuf:"bytes,7,opt,name=bio,proto3" json:"bio,omitempty"`
-	BioStatus       string                 `protobuf:"bytes,8,opt,name=bio_status,json=bioStatus,proto3" json:"bio_status,omitempty"`
-	AccountBadge    AccountBadge           `protobuf:"varint,11,opt,name=account_badge,json=accountBadge,proto3,enum=users.v1.AccountBadge" json:"account_badge,omitempty"`
-	FriendsCount    uint32                 `protobuf:"varint,12,opt,name=friends_count,json=friendsCount,proto3" json:"friends_count,omitempty"`
-	FollowersCount  uint32                 `protobuf:"varint,13,opt,name=followers_count,json=followersCount,proto3" json:"followers_count,omitempty"`
-	FollowingCount  uint32                 `protobuf:"varint,14,opt,name=following_count,json=followingCount,proto3" json:"following_count,omitempty"`
-	PostsCount      uint32                 `protobuf:"varint,15,opt,name=posts_count,json=postsCount,proto3" json:"posts_count,omitempty"`
-	BirthDate       *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=birth_date,json=birthDate,proto3" json:"birth_date,omitempty"`
+	Username        *string                `protobuf:"bytes,2,opt,name=username,proto3,oneof" json:"username,omitempty"`
+	DisplayName     *string                `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
+	ProfileImageUrl *string                `protobuf:"bytes,6,opt,name=profile_image_url,json=profileImageUrl,proto3,oneof" json:"profile_image_url,omitempty"`
+	Bio             *string                `protobuf:"bytes,7,opt,name=bio,proto3,oneof" json:"bio,omitempty"`
+	BioStatus       *string                `protobuf:"bytes,8,opt,name=bio_status,json=bioStatus,proto3,oneof" json:"bio_status,omitempty"`
+	AccountBadge    *AccountBadge          `protobuf:"varint,11,opt,name=account_badge,json=accountBadge,proto3,enum=users.v1.AccountBadge,oneof" json:"account_badge,omitempty"`
+	FriendsCount    *uint32                `protobuf:"varint,12,opt,name=friends_count,json=friendsCount,proto3,oneof" json:"friends_count,omitempty"`
+	FollowersCount  *uint32                `protobuf:"varint,13,opt,name=followers_count,json=followersCount,proto3,oneof" json:"followers_count,omitempty"`
+	FollowingCount  *uint32                `protobuf:"varint,14,opt,name=following_count,json=followingCount,proto3,oneof" json:"following_count,omitempty"`
+	PostsCount      *uint32                `protobuf:"varint,15,opt,name=posts_count,json=postsCount,proto3,oneof" json:"posts_count,omitempty"`
+	BirthDate       *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=birth_date,json=birthDate,proto3,oneof" json:"birth_date,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -767,71 +767,71 @@ func (x *UpdateUserRequest) GetId() string {
 }
 
 func (x *UpdateUserRequest) GetUsername() string {
-	if x != nil {
-		return x.Username
+	if x != nil && x.Username != nil {
+		return *x.Username
 	}
 	return ""
 }
 
 func (x *UpdateUserRequest) GetDisplayName() string {
-	if x != nil {
-		return x.DisplayName
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
 	}
 	return ""
 }
 
 func (x *UpdateUserRequest) GetProfileImageUrl() string {
-	if x != nil {
-		return x.ProfileImageUrl
+	if x != nil && x.ProfileImageUrl != nil {
+		return *x.ProfileImageUrl
 	}
 	return ""
 }
 
 func (x *UpdateUserRequest) GetBio() string {
-	if x != nil {
-		return x.Bio
+	if x != nil && x.Bio != nil {
+		return *x.Bio
 	}
 	return ""
 }
 
 func (x *UpdateUserRequest) GetBioStatus() string {
-	if x != nil {
-		return x.BioStatus
+	if x != nil && x.BioStatus != nil {
+		return *x.BioStatus
 	}
 	return ""
 }
 
 func (x *UpdateUserRequest) GetAccountBadge() AccountBadge {
-	if x != nil {
-		return x.AccountBadge
+	if x != nil && x.AccountBadge != nil {
+		return *x.AccountBadge
 	}
 	return AccountBadge_UNVERIFIED
 }
 
 func (x *UpdateUserRequest) GetFriendsCount() uint32 {
-	if x != nil {
-		return x.FriendsCount
+	if x != nil && x.FriendsCount != nil {
+		return *x.FriendsCount
 	}
 	return 0
 }
 
 func (x *UpdateUserRequest) GetFollowersCount() uint32 {
-	if x != nil {
-		return x.FollowersCount
+	if x != nil && x.FollowersCount != nil {
+		return *x.FollowersCount
 	}
 	return 0
 }
 
 func (x *UpdateUserRequest) GetFollowingCount() uint32 {
-	if x != nil {
-		return x.FollowingCount
+	if x != nil && x.FollowingCount != nil {
+		return *x.FollowingCount
 	}
 	return 0
 }
 
 func (x *UpdateUserRequest) GetPostsCount() uint32 {
-	if x != nil {
-		return x.PostsCount
+	if x != nil && x.PostsCount != nil {
+		return *x.PostsCount
 	}
 	return 0
 }
@@ -1962,12 +1962,12 @@ func (x *GetPrivacySettingsResponse) GetSettings() *PrivacySettings {
 type UpdatePrivacySettingsRequest struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	UserId              string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AvatarVisibility    *wrapperspb.Int32Value `protobuf:"bytes,2,opt,name=avatar_visibility,json=avatarVisibility,proto3" json:"avatar_visibility,omitempty"`
-	PhoneVisibility     *wrapperspb.Int32Value `protobuf:"bytes,3,opt,name=phone_visibility,json=phoneVisibility,proto3" json:"phone_visibility,omitempty"`
-	EmailVisibility     *wrapperspb.Int32Value `protobuf:"bytes,4,opt,name=email_visibility,json=emailVisibility,proto3" json:"email_visibility,omitempty"`
-	LastSeenVisibility  *wrapperspb.Int32Value `protobuf:"bytes,5,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3" json:"last_seen_visibility,omitempty"`
-	ReadReceiptsEnabled bool                   `protobuf:"varint,6,opt,name=read_receipts_enabled,json=readReceiptsEnabled,proto3" json:"read_receipts_enabled,omitempty"`
-	FindByUsername      bool                   `protobuf:"varint,7,opt,name=find_by_username,json=findByUsername,proto3" json:"find_by_username,omitempty"`
+	AvatarVisibility    *Visibility            `protobuf:"varint,2,opt,name=avatar_visibility,json=avatarVisibility,proto3,enum=users.v1.Visibility,oneof" json:"avatar_visibility,omitempty"`
+	PhoneVisibility     *Visibility            `protobuf:"varint,3,opt,name=phone_visibility,json=phoneVisibility,proto3,enum=users.v1.Visibility,oneof" json:"phone_visibility,omitempty"`
+	EmailVisibility     *Visibility            `protobuf:"varint,4,opt,name=email_visibility,json=emailVisibility,proto3,enum=users.v1.Visibility,oneof" json:"email_visibility,omitempty"`
+	LastSeenVisibility  *Visibility            `protobuf:"varint,5,opt,name=last_seen_visibility,json=lastSeenVisibility,proto3,enum=users.v1.Visibility,oneof" json:"last_seen_visibility,omitempty"`
+	ReadReceiptsEnabled *bool                  `protobuf:"varint,6,opt,name=read_receipts_enabled,json=readReceiptsEnabled,proto3,oneof" json:"read_receipts_enabled,omitempty"`
+	FindByUsername      *bool                  `protobuf:"varint,7,opt,name=find_by_username,json=findByUsername,proto3,oneof" json:"find_by_username,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -2009,44 +2009,44 @@ func (x *UpdatePrivacySettingsRequest) GetUserId() string {
 	return ""
 }
 
-func (x *UpdatePrivacySettingsRequest) GetAvatarVisibility() *wrapperspb.Int32Value {
-	if x != nil {
-		return x.AvatarVisibility
+func (x *UpdatePrivacySettingsRequest) GetAvatarVisibility() Visibility {
+	if x != nil && x.AvatarVisibility != nil {
+		return *x.AvatarVisibility
 	}
-	return nil
+	return Visibility_EVERYONE
 }
 
-func (x *UpdatePrivacySettingsRequest) GetPhoneVisibility() *wrapperspb.Int32Value {
-	if x != nil {
-		return x.PhoneVisibility
+func (x *UpdatePrivacySettingsRequest) GetPhoneVisibility() Visibility {
+	if x != nil && x.PhoneVisibility != nil {
+		return *x.PhoneVisibility
 	}
-	return nil
+	return Visibility_EVERYONE
 }
 
-func (x *UpdatePrivacySettingsRequest) GetEmailVisibility() *wrapperspb.Int32Value {
-	if x != nil {
-		return x.EmailVisibility
+func (x *UpdatePrivacySettingsRequest) GetEmailVisibility() Visibility {
+	if x != nil && x.EmailVisibility != nil {
+		return *x.EmailVisibility
 	}
-	return nil
+	return Visibility_EVERYONE
 }
 
-func (x *UpdatePrivacySettingsRequest) GetLastSeenVisibility() *wrapperspb.Int32Value {
-	if x != nil {
-		return x.LastSeenVisibility
+func (x *UpdatePrivacySettingsRequest) GetLastSeenVisibility() Visibility {
+	if x != nil && x.LastSeenVisibility != nil {
+		return *x.LastSeenVisibility
 	}
-	return nil
+	return Visibility_EVERYONE
 }
 
 func (x *UpdatePrivacySettingsRequest) GetReadReceiptsEnabled() bool {
-	if x != nil {
-		return x.ReadReceiptsEnabled
+	if x != nil && x.ReadReceiptsEnabled != nil {
+		return *x.ReadReceiptsEnabled
 	}
 	return false
 }
 
 func (x *UpdatePrivacySettingsRequest) GetFindByUsername() bool {
-	if x != nil {
-		return x.FindByUsername
+	if x != nil && x.FindByUsername != nil {
+		return *x.FindByUsername
 	}
 	return false
 }
@@ -2140,23 +2140,35 @@ const file_users_v1_users_proto_rawDesc = "" +
 	"\x05phone\x18\x02 \x01(\tH\x00R\x05phone\x12\x16\n" +
 	"\x05email\x18\x03 \x01(\tH\x00R\x05emailB\x0e\n" +
 	"\fcontact_type\"\x19\n" +
-	"\x17RegisterContactResponse\"\xcf\x03\n" +
+	"\x17RegisterContactResponse\"\xbc\x05\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
-	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12*\n" +
-	"\x11profile_image_url\x18\x06 \x01(\tR\x0fprofileImageUrl\x12\x10\n" +
-	"\x03bio\x18\a \x01(\tR\x03bio\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\busername\x18\x02 \x01(\tH\x00R\busername\x88\x01\x01\x12&\n" +
+	"\fdisplay_name\x18\x03 \x01(\tH\x01R\vdisplayName\x88\x01\x01\x12/\n" +
+	"\x11profile_image_url\x18\x06 \x01(\tH\x02R\x0fprofileImageUrl\x88\x01\x01\x12\x15\n" +
+	"\x03bio\x18\a \x01(\tH\x03R\x03bio\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"bio_status\x18\b \x01(\tR\tbioStatus\x12;\n" +
-	"\raccount_badge\x18\v \x01(\x0e2\x16.users.v1.AccountBadgeR\faccountBadge\x12#\n" +
-	"\rfriends_count\x18\f \x01(\rR\ffriendsCount\x12'\n" +
-	"\x0ffollowers_count\x18\r \x01(\rR\x0efollowersCount\x12'\n" +
-	"\x0ffollowing_count\x18\x0e \x01(\rR\x0efollowingCount\x12\x1f\n" +
-	"\vposts_count\x18\x0f \x01(\rR\n" +
-	"postsCount\x129\n" +
+	"bio_status\x18\b \x01(\tH\x04R\tbioStatus\x88\x01\x01\x12@\n" +
+	"\raccount_badge\x18\v \x01(\x0e2\x16.users.v1.AccountBadgeH\x05R\faccountBadge\x88\x01\x01\x12(\n" +
+	"\rfriends_count\x18\f \x01(\rH\x06R\ffriendsCount\x88\x01\x01\x12,\n" +
+	"\x0ffollowers_count\x18\r \x01(\rH\aR\x0efollowersCount\x88\x01\x01\x12,\n" +
+	"\x0ffollowing_count\x18\x0e \x01(\rH\bR\x0efollowingCount\x88\x01\x01\x12$\n" +
+	"\vposts_count\x18\x0f \x01(\rH\tR\n" +
+	"postsCount\x88\x01\x01\x12>\n" +
 	"\n" +
-	"birth_date\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\tbirthDate\"\x14\n" +
+	"birth_date\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampH\n" +
+	"R\tbirthDate\x88\x01\x01B\v\n" +
+	"\t_usernameB\x0f\n" +
+	"\r_display_nameB\x14\n" +
+	"\x12_profile_image_urlB\x06\n" +
+	"\x04_bioB\r\n" +
+	"\v_bio_statusB\x10\n" +
+	"\x0e_account_badgeB\x10\n" +
+	"\x0e_friends_countB\x12\n" +
+	"\x10_followers_countB\x12\n" +
+	"\x10_following_countB\x0e\n" +
+	"\f_posts_countB\r\n" +
+	"\v_birth_date\"\x14\n" +
 	"\x12UpdateUserResponse\"#\n" +
 	"\x11DeleteUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x14\n" +
@@ -2209,15 +2221,21 @@ const file_users_v1_users_proto_rawDesc = "" +
 	"\x19GetPrivacySettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"S\n" +
 	"\x1aGetPrivacySettingsResponse\x125\n" +
-	"\bsettings\x18\x01 \x01(\v2\x19.users.v1.PrivacySettingsR\bsettings\"\xbe\x03\n" +
+	"\bsettings\x18\x01 \x01(\v2\x19.users.v1.PrivacySettingsR\bsettings\"\xc8\x04\n" +
 	"\x1cUpdatePrivacySettingsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12H\n" +
-	"\x11avatar_visibility\x18\x02 \x01(\v2\x1b.google.protobuf.Int32ValueR\x10avatarVisibility\x12F\n" +
-	"\x10phone_visibility\x18\x03 \x01(\v2\x1b.google.protobuf.Int32ValueR\x0fphoneVisibility\x12F\n" +
-	"\x10email_visibility\x18\x04 \x01(\v2\x1b.google.protobuf.Int32ValueR\x0femailVisibility\x12M\n" +
-	"\x14last_seen_visibility\x18\x05 \x01(\v2\x1b.google.protobuf.Int32ValueR\x12lastSeenVisibility\x122\n" +
-	"\x15read_receipts_enabled\x18\x06 \x01(\bR\x13readReceiptsEnabled\x12(\n" +
-	"\x10find_by_username\x18\a \x01(\bR\x0efindByUsername\"\x1f\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12F\n" +
+	"\x11avatar_visibility\x18\x02 \x01(\x0e2\x14.users.v1.VisibilityH\x00R\x10avatarVisibility\x88\x01\x01\x12D\n" +
+	"\x10phone_visibility\x18\x03 \x01(\x0e2\x14.users.v1.VisibilityH\x01R\x0fphoneVisibility\x88\x01\x01\x12D\n" +
+	"\x10email_visibility\x18\x04 \x01(\x0e2\x14.users.v1.VisibilityH\x02R\x0femailVisibility\x88\x01\x01\x12K\n" +
+	"\x14last_seen_visibility\x18\x05 \x01(\x0e2\x14.users.v1.VisibilityH\x03R\x12lastSeenVisibility\x88\x01\x01\x127\n" +
+	"\x15read_receipts_enabled\x18\x06 \x01(\bH\x04R\x13readReceiptsEnabled\x88\x01\x01\x12-\n" +
+	"\x10find_by_username\x18\a \x01(\bH\x05R\x0efindByUsername\x88\x01\x01B\x14\n" +
+	"\x12_avatar_visibilityB\x13\n" +
+	"\x11_phone_visibilityB\x13\n" +
+	"\x11_email_visibilityB\x17\n" +
+	"\x15_last_seen_visibilityB\x18\n" +
+	"\x16_read_receipts_enabledB\x13\n" +
+	"\x11_find_by_username\"\x1f\n" +
 	"\x1dUpdatePrivacySettingsResponse*A\n" +
 	"\n" +
 	"Visibility\x12\f\n" +
@@ -2305,7 +2323,6 @@ var file_users_v1_users_proto_goTypes = []any{
 	(*UpdatePrivacySettingsRequest)(nil),  // 32: users.v1.UpdatePrivacySettingsRequest
 	(*UpdatePrivacySettingsResponse)(nil), // 33: users.v1.UpdatePrivacySettingsResponse
 	(*timestamppb.Timestamp)(nil),         // 34: google.protobuf.Timestamp
-	(*wrapperspb.Int32Value)(nil),         // 35: google.protobuf.Int32Value
 }
 var file_users_v1_users_proto_depIdxs = []int32{
 	1,  // 0: users.v1.User.account_badge:type_name -> users.v1.AccountBadge
@@ -2328,10 +2345,10 @@ var file_users_v1_users_proto_depIdxs = []int32{
 	26, // 17: users.v1.UserExistsResponse.response:type_name -> users.v1.UserExistence
 	26, // 18: users.v1.UsersExistResponse.users:type_name -> users.v1.UserExistence
 	4,  // 19: users.v1.GetPrivacySettingsResponse.settings:type_name -> users.v1.PrivacySettings
-	35, // 20: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> google.protobuf.Int32Value
-	35, // 21: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> google.protobuf.Int32Value
-	35, // 22: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> google.protobuf.Int32Value
-	35, // 23: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> google.protobuf.Int32Value
+	0,  // 20: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> users.v1.Visibility
+	0,  // 21: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> users.v1.Visibility
+	0,  // 22: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> users.v1.Visibility
+	0,  // 23: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> users.v1.Visibility
 	5,  // 24: users.v1.UsersService.CreateUser:input_type -> users.v1.CreateUserRequest
 	7,  // 25: users.v1.UsersService.RegisterContact:input_type -> users.v1.RegisterContactRequest
 	9,  // 26: users.v1.UsersService.UpdateUser:input_type -> users.v1.UpdateUserRequest
@@ -2380,6 +2397,7 @@ func file_users_v1_users_proto_init() {
 		(*RegisterContactRequest_Phone)(nil),
 		(*RegisterContactRequest_Email)(nil),
 	}
+	file_users_v1_users_proto_msgTypes[7].OneofWrappers = []any{}
 	file_users_v1_users_proto_msgTypes[13].OneofWrappers = []any{
 		(*GetUserRequest_Id)(nil),
 		(*GetUserRequest_Username)(nil),
@@ -2392,6 +2410,7 @@ func file_users_v1_users_proto_init() {
 		(*UserExistsRequest_Email)(nil),
 		(*UserExistsRequest_Phone)(nil),
 	}
+	file_users_v1_users_proto_msgTypes[30].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

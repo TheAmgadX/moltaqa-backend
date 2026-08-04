@@ -8,9 +8,15 @@ func (t Topic) String() string {
 
 const (
 	// User Topics
-	UserCreated Topic = "user.created"
+	UserRegistered    Topic = "user.registered"
+	ContactRegistered Topic = "contact.registered"
+	UserUpdated       Topic = "user.updated"
+	UserDeleted       Topic = "user.deleted"
+	UserRestored      Topic = "user.restored"
 )
 
 func Topics() []string {
-	return []string{UserCreated.String()}
+	return []string{UserRegistered.String(), ContactRegistered.String(),
+		UserUpdated.String(), UserDeleted.String(), UserRestored.String(),
+	}
 }
