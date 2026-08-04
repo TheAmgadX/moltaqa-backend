@@ -7,46 +7,38 @@ import (
 
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/domain"
 	utils_postgres "github.com/TheAmgadX/moltaqa-backend/shared/utils/postgres"
-	"github.com/jackc/pgx/v5"
+	"github.com/google/uuid"
 )
 
-func mapRowToPrivacySettings(row *pgx.Rows) (*domain.PrivacySettings, error) {
+func (r *UserPostgresRepository) GetPrivacySettings(ctx context.Context, id string) (*domain.PrivacySettings, error) {
+	query := `
+        SELECT avatar_visibility, phone_visibility, email_visibility,
+               last_seen_visibility, read_receipts_enabled, find_by_username
+        FROM privacy_settings WHERE user_id = $1
+    `
 	var settings domain.PrivacySettings
-
-	err := (*row).Scan(&settings, &settings.UserId, &settings.AvatarVisibility,
-		&settings.PhoneVisibility, &settings.EmailVisibility,
-		&settings.LastSeenVisibility, &settings.ReadReceiptsEnabled, &settings.FindByUsername,
-	)
+	user_id, err := uuid.Parse(id)
 
 	if err != nil {
 		return nil, err
 	}
 
+	settings.UserId = user_id
+
+	err = r.db.QueryRow(ctx, query, id).Scan(
+		&settings.AvatarVisibility, &settings.PhoneVisibility,
+		&settings.EmailVisibility, &settings.LastSeenVisibility,
+		&settings.ReadReceiptsEnabled, &settings.FindByUsername,
+	)
+
+	if err != nil {
+		return nil, utils_postgres.MapDBErrorToServiceError(err)
+	}
+
 	return &settings, nil
 }
 
-func (r *UserPostgresRepository) GetPrivacySettings(ctx context.Context, id string) (*domain.PrivacySettings, error) {
-	query := `
-		SELECT * FROM privacy_settings WHERE user_id = $1
-	`
-
-	row, err := r.db.Query(ctx, query, id)
-
-	if err != nil {
-		return nil, utils_postgres.MapDBErrorToServiceError(err)
-	}
-	defer row.Close()
-
-	settings, err := mapRowToPrivacySettings(&row)
-
-	if err != nil {
-		return nil, utils_postgres.MapDBErrorToServiceError(err)
-	}
-
-	return settings, nil
-}
-
-func (r *UserPostgresRepository) UpdatePrivacySettings(ctx context.Context, id string, settingsUpdate *domain.PrivacySettingsUpdate) error {
+func (r *UserPostgresRepository) UpdatePrivacySettings(ctx context.Context, settingsUpdate *domain.PrivacySettingsUpdate) error {
 	// Build the SQL query dynamically based on the fields to update
 	var (
 		sets []string
@@ -90,12 +82,16 @@ func (r *UserPostgresRepository) UpdatePrivacySettings(ctx context.Context, id s
 		i++
 	}
 
+	if len(sets) == 0 {
+		return utils_postgres.ErrInvalidInput
+	}
+
 	// build the query
 	// id is the last passed argument so it's passed as i (the counter.)
 	query := fmt.Sprintf(`
 		UPDATE privacy_settings
 		SET %s
-		WHERE id = $%d
+		WHERE user_id = $%d
 	`, strings.Join(sets, ", "), i)
 
 	args = append(args, settingsUpdate.UserId)

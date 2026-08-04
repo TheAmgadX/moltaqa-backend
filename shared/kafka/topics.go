@@ -8,7 +8,11 @@ func (t Topic) String() string {
 
 const (
 	// User Topics
-	UserCreated Topic = "user.created"
+	UserRegistered    Topic = "user.registered"
+	ContactRegistered Topic = "contact.registered"
+	UserUpdated       Topic = "user.updated"
+	UserDeleted       Topic = "user.deleted"
+	UserRestored      Topic = "user.restored"
 
 	// Auth notification topics
 	AuthSendEmail Topic = "auth.send_email"
@@ -17,7 +21,9 @@ const (
 
 func Topics() []string {
 	return []string{
-		UserCreated.String(),
+		UserRegistered.String(), ContactRegistered.String(),
+		UserUpdated.String(), UserDeleted.String(), UserRestored.String(),
+	,
 		AuthSendEmail.String(),
 		AuthSendSMS.String(),
 	}

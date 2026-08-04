@@ -4,28 +4,26 @@ import (
 	"time"
 
 	pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/domain"
 )
 
 func mapCreateUserRequestToDomain(req *pb.CreateUserRequest) *domain.User {
+
+	email := ""
+	phone := ""
+
+	switch lookup := req.Contact.(type) {
+	case *pb.CreateUserRequest_Email:
+		email = lookup.Email
+	case *pb.CreateUserRequest_Phone:
+		phone = lookup.Phone
+	}
+
 	return &domain.User{
-		Username:       req.Username,
-		Email:          req.Email,
-		PhoneNumber:    req.Phone,
-		DisplayName:    req.DisplayName,
-		EmailVerified:  time.Time{},
-		PhoneVerified:  time.Time{},
-		BirthDate:      time.Time{},
-		BioStatus:      "",
-		AccountBadge:   domain.UNVERIFIED,
-		FriendsCount:   0,
-		FollowersCount: 0,
-		FollowingCount: 0,
-		PostsCount:     0,
-		DeletedAt:      time.Time{},
+		Email:       email,
+		PhoneNumber: phone,
 	}
 }
 
@@ -51,24 +49,31 @@ func mapRegisterContactRequestToDomain(req *pb.RegisterContactRequest) *domain.C
 	}
 }
 
-func mapUpdateUserRequestToDomain(req *pb.UpdateUserRequest) (*domain.User, error) {
-	id, err := uuid.Parse(req.Id)
-	if err != nil {
-		return nil, domain.ErrInvalidUserId
+func mapUpdateUserRequestToDomain(req *pb.UpdateUserRequest) (*domain.UserUpdate, error) {
+	user := &domain.UserUpdate{
+		Id:              req.Id,
+		Username:        req.Username,
+		ProfileImageUrl: req.ProfileImageUrl,
+		DisplayName:     req.DisplayName,
+		Bio:             req.Bio,
+		BioStatus:       req.BioStatus,
+		FriendsCount:    req.FriendsCount,
+		FollowersCount:  req.FollowersCount,
+		FollowingCount:  req.FollowingCount,
+		PostsCount:      req.PostsCount,
 	}
 
-	return &domain.User{
-		Id:             id,
-		Username:       req.Username,
-		DisplayName:    req.DisplayName,
-		BirthDate:      mapTimeToDomain(req.BirthDate),
-		BioStatus:      req.BioStatus,
-		AccountBadge:   mapAccountBadgeToDomain(req.AccountBadge),
-		FriendsCount:   req.FriendsCount,
-		FollowersCount: req.FollowersCount,
-		FollowingCount: req.FollowingCount,
-		PostsCount:     req.PostsCount,
-	}, nil
+	if req.BirthDate != nil {
+		t := mapTimeToDomain(req.BirthDate)
+		user.BirthDate = &t
+	}
+
+	if req.AccountBadge != nil {
+		badge := mapAccountBadgeToDomain(*req.AccountBadge)
+		user.AccountBadge = &badge
+	}
+
+	return user, nil
 }
 
 func mapAccountBadgeToProto(accountBadge domain.AccountBadgeType) pb.AccountBadge {
@@ -122,8 +127,6 @@ func mapUserToProto(user *domain.User) *pb.User {
 		Email:          user.Email,
 		Phone:          user.PhoneNumber,
 		DisplayName:    user.DisplayName,
-		EmailVerified:  mapTimeToProto(user.EmailVerified),
-		PhoneVerified:  mapTimeToProto(user.PhoneVerified),
 		BirthDate:      mapTimeToProto(user.BirthDate),
 		BioStatus:      user.BioStatus,
 		AccountBadge:   mapAccountBadgeToProto(user.AccountBadge),
@@ -249,14 +252,18 @@ func mapUsersSummariesToProto(users []domain.UserSummary) []*pb.UserSummary {
 	return result
 }
 
-func mapUserExistanceToProto(result []domain.UserExistence) []*pb.UserExistence {
+func mapUserExistanceToProto(user domain.UserExistence) *pb.UserExistence {
+	return &pb.UserExistence{
+		UserId: user.Id,
+		Exists: user.Exists,
+	}
+}
+
+func mapUsersExistanceToProto(result []domain.UserExistence) []*pb.UserExistence {
 	protoResult := make([]*pb.UserExistence, 0, len(result))
 
 	for _, user := range result {
-		protoResult = append(protoResult, &pb.UserExistence{
-			UserId: user.Id,
-			Exists: user.Exists,
-		})
+		protoResult = append(protoResult, mapUserExistanceToProto(user))
 	}
 
 	return protoResult
@@ -288,13 +295,55 @@ func mapPrivacySettingsToProto(settings *domain.PrivacySettings) *pb.PrivacySett
 	}
 }
 
-func mapUpdatePrivacySettingsRequestToDomain(req *pb.UpdatePrivacySettingsRequest) *domain.PrivacySettings {
-	return &domain.PrivacySettings{
-		AvatarVisibility:    domain.Visibility(req.AvatarVisibility.Value),
-		PhoneVisibility:     domain.Visibility(req.PhoneVisibility.Value),
-		EmailVisibility:     domain.Visibility(req.EmailVisibility.Value),
-		LastSeenVisibility:  domain.Visibility(req.LastSeenVisibility.Value),
-		ReadReceiptsEnabled: req.ReadReceiptsEnabled,
-		FindByUsername:      req.FindByUsername,
+func MapProtoVisibilityToDomain(val pb.Visibility) domain.Visibility {
+	switch val {
+	case pb.Visibility_EVERYONE:
+		return domain.EVERYONE
+	case pb.Visibility_FRIENDS:
+		return domain.FRIENDS
+	case pb.Visibility_CONTACTS:
+		return domain.CONTACTS
+	case pb.Visibility_NOBODY:
+		return domain.NOBODY
+	default:
+		// Catches invalid integers like 999 sent over gRPC
+		return ""
 	}
+}
+
+func mapUpdatePrivacySettingsRequestToDomain(req *pb.UpdatePrivacySettingsRequest) *domain.PrivacySettingsUpdate {
+	settings := &domain.PrivacySettingsUpdate{}
+
+	settings.UserId = req.UserId
+
+	if req.AvatarVisibility != nil {
+		vis := MapProtoVisibilityToDomain(*req.AvatarVisibility)
+		settings.AvatarVisibility = &vis
+	}
+
+	if req.PhoneVisibility != nil {
+		vis := MapProtoVisibilityToDomain(*req.PhoneVisibility)
+		settings.PhoneVisibility = &vis
+	}
+
+	if req.EmailVisibility != nil {
+		vis := MapProtoVisibilityToDomain(*req.EmailVisibility)
+		settings.EmailVisibility = &vis
+	}
+
+	if req.LastSeenVisibility != nil {
+		vis := MapProtoVisibilityToDomain(*req.LastSeenVisibility)
+		settings.LastSeenVisibility = &vis
+	}
+
+	// 2. Booleans
+	if req.ReadReceiptsEnabled != nil {
+		settings.ReadReceiptsEnabled = req.ReadReceiptsEnabled
+	}
+
+	if req.FindByUsername != nil {
+		settings.FindByUsername = req.FindByUsername
+	}
+
+	return settings
 }
