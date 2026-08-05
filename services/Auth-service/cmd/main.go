@@ -24,6 +24,8 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func build_DB_DSN() string {
@@ -138,6 +140,10 @@ func createServer(port string) (*grpc.Server, *net.Listener, func(), error) {
 	}
 
 	pb.RegisterAuthServiceServer(grpc_server, Auth_grpc.NewAuthGRPCServer(service))
+
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(grpc_server, healthServer)
+	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	cleanup := func() {
 		usersConn.Close()
