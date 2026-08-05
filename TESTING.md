@@ -14,7 +14,13 @@ All service-level and transport-level tests use an in-memory repository mock (`f
 *   You can run these tests without having PostgreSQL running.
 *   You can simulate errors (e.g., `not found`, `duplicate key`, or generic database errors) by directly setting error flags on the mock repositories inside the test cases (e.g., `repo.getErr = errors.New("not found")`).
 
-### 2. Kafka Integration
+### 2. Postgres Repository Tests (Docker Required)
+The repository integration tests spin up a real Postgres container automatically via [testcontainers-go](https://golang.testcontainers.org/).
+*   **Prerequisite**: Docker must be running before executing these tests.
+*   Each test function starts its own container and tears it down via `t.Cleanup`, so tests are fully isolated.
+*   No external database configuration is needed — the DSN is obtained from the container automatically.
+
+### 3. Kafka Integration
 The test suites use a real Kafka client targeting `127.0.0.1:9092`.
 *   **Prerequisite**: You must start the Kafka container before running the tests.
 *   The tests use a short delivery timeout configuration to ensure tests fail quickly if the broker is unavailable:
@@ -49,17 +55,21 @@ If you only want to test a single component or package:
     ```bash
     go test -v ./services/user-service/testing/grpc/...
     ```
-*   **API Gateway HTTP Routes & CORS**:
-    ```bash
-    go test -v ./services/api-gateway/cmd/...
-    ```
 *   **Domain logic validations**:
     ```bash
-    go test -v ./services/user-service/internal/domain/...
+    go test -v ./services/user-service/testing/domain/...
+    ```
+*   **Postgres repository integration tests** (requires Docker):
+    ```bash
+    go test -v ./services/user-service/testing/repository/...
     ```
 *   **Environment variable helpers**:
     ```bash
-    go test -v ./shared/env/...
+    go test -v ./shared/testing/env/...
+    ```
+*   **Asset path validation utilities**:
+    ```bash
+    go test -v ./shared/testing/utils/assets/...
     ```
 *   **Postgres error parser utilities**:
     ```bash
@@ -123,21 +133,17 @@ Here is an overview of each test file and what it is responsible for validating:
     Utility file containing setup test helpers (like `mustNewGRPCServerWithRepo`) to configure gRPC servers with custom repository mock implementations.
 
 ### 3. Domain Logic Tests
-*   **[`services/user-service/internal/domain/errors_test.go`](./services/user-service/internal/domain/errors_test.go)**
+*   **[`services/user-service/testing/domain/errors_test.go`](./services/user-service/testing/domain/errors_test.go)**
     Validates translation of generic PostgreSQL database errors to domain-specific service errors and tests format parameters inside validation error structs.
 
-### 4. Shared Utilities Tests
+### 4. Repository Integration Tests
+*   **[`services/user-service/testing/repository/postgres_repo_test.go`](./services/user-service/testing/repository/postgres_repo_test.go)**
+    Integration tests for `UserPostgresRepository`. Uses `testcontainers-go` to spin up a real Postgres container per test, covering all repository methods: `Create`, `Get`, `GetUsers`, `Update`, `SoftDelete`, `RestoreUser`, `GetSummary`, `GetSummaries`, `Search`, `Exists`, `UsersExist`, `RegisterContact`, `GetPrivacySettings`, and `UpdatePrivacySettings`.
+
+### 5. Shared Utilities Tests
 *   **[`shared/utils/postgres/errors_test.go`](./shared/utils/postgres/errors_test.go)**
     Tests the pure mapping function that translates driver-specific PostgreSQL error codes (such as duplicate key, foreign key, lock timeout) into shared SQL sentinels.
-*   **[`shared/env/env_test.go`](./shared/env/env_test.go)**
+*   **[`shared/testing/env/env_test.go`](./shared/testing/env/env_test.go)**
     Tests configuration settings helpers (`GetString`, `GetInt`, `GetBool`) under different virtual environment states using isolated variable sets.
-*   **[`shared/utils/assets/validation_test.go`](./shared/utils/assets/validation_test.go)**
+*   **[`shared/testing/utils/assets/validation_test.go`](./shared/testing/utils/assets/validation_test.go)**
     Tests image file properties validation (`ValidateProfileImagePath`) including path traversal attacks (`..`), absolute prefixes (`/`), max length constraints, and file extension checks.
-
-### 5. API Gateway Tests
-*   **[`services/api-gateway/cmd/main_test.go`](./services/api-gateway/cmd/main_test.go)**
-    Tests API Gateway route routing (e.g. root `"/"` route returning `"Hello, World!"`) and CORS preflight handling via `middlewares.CORSMiddleware`.
-
-
-
-
