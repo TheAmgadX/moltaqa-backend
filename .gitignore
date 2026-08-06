@@ -6,3 +6,9 @@ secrets.yml
 build/
 
 services/user-service/deployments/k8s/postgres_secrets.yml
+
+# test artifacts
+*.exe
+coverage.out
+coverage
+
