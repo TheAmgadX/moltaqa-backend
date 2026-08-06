@@ -36,6 +36,7 @@ var (
 
 	ErrInvalidAction    = errors.New("invalid auth action")
 	ErrInvalidRecipient = errors.New("invalid email or phone")
+	ErrUserNotFound     = errors.New("user not found")
 
 	ErrAuthAlreadyExists  = errors.New("auth resource already exists")
 	ErrInvalidAuthInput   = errors.New("invalid auth input")

@@ -19,6 +19,14 @@ func nullIfZeroTime(time time.Time) any {
 	return time
 }
 
+func nullIfEmpty(value string) any {
+	if value == "" {
+		return nil
+	}
+
+	return value
+}
+
 func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) error {
 	if user == nil {
 		return domain.ErrInvalidUserInput
@@ -45,7 +53,7 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		    id,
 		    username,
 		    email,
-		    phone,
+		    phone_number,
 		    display_name,
 		    birth_date,
 		    bio,
@@ -68,8 +76,8 @@ func (r *UserPostgresRepository) Create(ctx context.Context, user *domain.User) 
 		query,
 		user.Id,
 		user.Username,
-		user.Email,
-		user.PhoneNumber,
+		nullIfEmpty(user.Email),
+		nullIfEmpty(user.PhoneNumber),
 		user.DisplayName,
 		nullIfZeroTime(user.BirthDate),
 		user.Bio,
@@ -111,7 +119,7 @@ func (r *UserPostgresRepository) RegisterContact(ctx context.Context, contact *d
 		SET
 			%s = $1
 		WHERE id = $2
-	`, contact.TypeString())
+	`, contact.ColumnName())
 
 	if contact.UserId == "" {
 		return utils_postgres.ErrInvalidInput
@@ -298,7 +306,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 	query := fmt.Sprintf(`
 		SELECT * FROM users
 		WHERE %s = $1
-	`, lookup.TypeString())
+	`, lookup.ColumnName())
 
 	rows, err := r.db.Query(ctx, query, lookup.Value)
 
@@ -363,7 +371,7 @@ func (r *UserPostgresRepository) GetUsers(ctx context.Context, ids []string) ([]
 // warning: this should be updated whenever the user summary fields change.
 func getUserSummaryFieldsString() []string {
 	return []string{
-		"id", "username", "display_name", "phone", "profile_image_url", "account_badge",
+		"id", "username", "display_name", "phone_number", "profile_image_url", "account_badge",
 	}
 }
 
@@ -462,7 +470,7 @@ func (r *UserPostgresRepository) Search(ctx context.Context, user_search *domain
 	search := "%" + user_search.Query + "%"
 
 	query := `
-    SELECT u.id, u.username, u.display_name, u.phone, u.profile_image_url, u.account_badge
+    SELECT u.id, u.username, u.display_name, u.phone_number, u.profile_image_url, u.account_badge
     FROM users u
     JOIN privacy_settings ps
         ON ps.user_id = u.id
@@ -517,7 +525,7 @@ func (r *UserPostgresRepository) Exists(ctx context.Context, lookup domain.Looku
 	query := `
 		SELECT id
 		FROM users
-		WHERE ` + lookup.TypeString() + ` = $1
+		WHERE ` + lookup.ColumnName() + ` = $1
 	`
 
 	rows, err := r.db.Query(ctx, query, lookup.Value)
@@ -529,7 +537,7 @@ func (r *UserPostgresRepository) Exists(ctx context.Context, lookup domain.Looku
 	defer rows.Close()
 
 	if !rows.Next() {
-		return "", domain.ErrUserNotFound
+		return "", utils_postgres.ErrNotFound
 	}
 
 	var id string

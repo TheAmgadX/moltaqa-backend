@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"errors"
+	"log"
 	"time"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
@@ -26,6 +28,7 @@ type TokenSigner interface {
 }
 
 type UsersClient interface {
+	CreateUser(ctx context.Context, in *userspb.CreateUserRequest, opts ...grpc.CallOption) (*userspb.CreateUserResponse, error)
 	UserExists(ctx context.Context, in *userspb.UserExistsRequest, opts ...grpc.CallOption) (*userspb.UserExistsResponse, error)
 	DeleteUser(ctx context.Context, in *userspb.DeleteUserRequest, opts ...grpc.CallOption) (*userspb.DeleteUserResponse, error)
 	RestoreUser(ctx context.Context, in *userspb.RestoreUserRequest, opts ...grpc.CallOption) (*userspb.RestoreUserResponse, error)
@@ -64,11 +67,16 @@ func (s *AuthService) VerifyOTP(ctx context.Context, otpTx domain.OTPTransaction
 		return "", "", err
 	}
 
+	log.Println("1. Validation OK")
+
 	hashedOTP := hashValue(otpTx.OTPHash)
 	storedOTP, err := s.otpStore.Get(ctx, domain.OTPTransaction{OTPHash: hashedOTP})
 	if err != nil {
+		log.Printf("otpStore.Get failed: %v", err)
+
 		return "", "", err
 	}
+	log.Println("2. OTP loaded")
 
 	if storedOTP.Attempts >= maxOTPAttempts {
 		return "", "", domain.ErrOTPMaxAttemptsExceeded
@@ -82,21 +90,38 @@ func (s *AuthService) VerifyOTP(ctx context.Context, otpTx domain.OTPTransaction
 		return "", "", domain.ErrOTPInvalid
 	}
 
-	if err := s.otpStore.Delete(ctx, *storedOTP); err != nil {
-		return "", "", err
-	}
-
 	switch storedOTP.Action {
 	case domain.ActionLogin:
 		userID, err := s.resolveUserID(ctx, *storedOTP)
 		if err != nil {
+			if errors.Is(err, domain.ErrUserNotFound) {
+				log.Printf("user not found: %v", err)
+
+				userID, err = s.createUser(ctx, *storedOTP)
+			}
+		}
+		if err != nil {
+			log.Printf("resolve or create user failed: %v", err)
+
 			return "", "", err
 		}
+		log.Println("3. User resolved")
 
 		accessToken, refreshToken, err := s.createTokenPair(ctx, userID)
 		if err != nil {
+			log.Printf("createTokenPair failed: %v", err)
+
 			return "", "", err
 		}
+		log.Println("4. Tokens created")
+
+		if err := s.otpStore.Delete(ctx, *storedOTP); err != nil {
+			log.Printf("Delete failed: %v", err)
+
+			return "", "", err
+		}
+
+		log.Println("5. OTP deleted")
 
 		return accessToken, refreshToken, nil
 
@@ -114,6 +139,12 @@ func (s *AuthService) VerifyOTP(ctx context.Context, otpTx domain.OTPTransaction
 			return "", "", err
 		}
 
+		if err := s.otpStore.Delete(ctx, *storedOTP); err != nil {
+			log.Printf("Delete failed: %v", err)
+
+			return "", "", err
+		}
+
 		return "", "", nil
 
 	case domain.ActionDelete:
@@ -127,6 +158,12 @@ func (s *AuthService) VerifyOTP(ctx context.Context, otpTx domain.OTPTransaction
 		}
 
 		if _, err := s.users.DeleteUser(ctx, &userspb.DeleteUserRequest{Id: userID}); err != nil {
+			return "", "", err
+		}
+
+		if err := s.otpStore.Delete(ctx, *storedOTP); err != nil {
+			log.Printf("Delete failed: %v", err)
+
 			return "", "", err
 		}
 

@@ -35,6 +35,15 @@ spec:
             - name: USER_SERVICE_URL
               value: "user-service:50051"
 
+            - name: AUTH_SERVICE_URL
+              value: "auth-service:50051"
+
+            - name: JWT_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: auth-jwt-secret
+                  key: JWT_SIGNING_KEY
+
           resources:
             requests:
               cpu: "100m"

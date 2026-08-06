@@ -28,3 +28,12 @@ func (l Lookup) TypeString() string {
 		return ""
 	}
 }
+
+func (l Lookup) ColumnName() string {
+	switch l.Type {
+	case LookupPhone:
+		return "phone_number"
+	default:
+		return l.TypeString()
+	}
+}

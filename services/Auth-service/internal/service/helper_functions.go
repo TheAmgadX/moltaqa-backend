@@ -6,12 +6,17 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"log"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
 	userspb "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -37,14 +42,22 @@ func (s *AuthService) startOTPTransaction(ctx context.Context, otpTx domain.OTPT
 		return err
 	}
 
+	// [TESTING]: Log the OTP so it can be consumed since there are no email/SMS services configured yet.
+	fmt.Printf("[TESTING] Generated OTP for %s: %s\n", otpTx.Email+otpTx.Phone, otp)
+
 	otpTx.OTPHash = hashValue(otp)
 	otpTx.Attempts = 0
+
+	fmt.Println("[DEBUG] before Save")
 
 	if err := s.otpStore.Save(ctx, otpTx); err != nil {
 		return err
 	}
 
-	return s.publishOTP(ctx, otpTx, otp)
+	fmt.Println("[DEBUG] before publish")
+	err2 := s.publishOTP(ctx, otpTx, otp)
+	fmt.Println("[DEBUG] after publish, err:", err2)
+	return err2
 }
 
 func (s *AuthService) publishOTP(ctx context.Context, otpTx domain.OTPTransaction, otp string) error {
@@ -111,14 +124,108 @@ func (s *AuthService) resolveUserID(ctx context.Context, otpTx domain.OTPTransac
 
 	res, err := s.users.UserExists(ctx, req)
 	if err != nil {
-		return "", err
+		mappedErr := mapUsersClientError(err)
+		logUsersClientError("UserExists", err, mappedErr)
+		return "", mappedErr
 	}
 
 	if res.GetResponse() == nil || !res.GetResponse().GetExists() {
-		return "", domain.ErrInvalidRecipient
+		return "", domain.ErrUserNotFound
+	}
+
+	if res.GetResponse().GetUserId() == "" {
+		return "", domain.ErrInternal
 	}
 
 	return res.GetResponse().GetUserId(), nil
+}
+
+func (s *AuthService) createUser(ctx context.Context, otpTx domain.OTPTransaction) (string, error) {
+	if s.users == nil {
+		return "", domain.ErrServiceUnavailable
+	}
+
+	req := &userspb.CreateUserRequest{}
+	if otpTx.Email != "" {
+		req.Contact = &userspb.CreateUserRequest_Email{Email: otpTx.Email}
+	} else {
+		req.Contact = &userspb.CreateUserRequest_Phone{Phone: otpTx.Phone}
+	}
+
+	res, err := s.users.CreateUser(ctx, req)
+	if err != nil {
+		mappedErr := mapUsersClientError(err)
+		logUsersClientError("CreateUser", err, mappedErr)
+		if errors.Is(mappedErr, domain.ErrAuthAlreadyExists) {
+			return s.resolveUserID(ctx, otpTx)
+		}
+
+		return "", mappedErr
+	}
+
+	if res.GetUser() == nil || res.GetUser().GetId() == "" {
+		return "", domain.ErrInternal
+	}
+
+	return res.GetUser().GetId(), nil
+}
+
+func mapUsersClientError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if errors.Is(err, domain.ErrUserNotFound) {
+		return domain.ErrUserNotFound
+	}
+
+	if st, ok := status.FromError(err); ok {
+		if isUserNotFoundStatus(st) {
+			return domain.ErrUserNotFound
+		}
+
+		switch st.Code() {
+		case codes.InvalidArgument:
+			return domain.ErrInvalidRecipient
+		case codes.NotFound:
+			return domain.ErrUserNotFound
+		case codes.AlreadyExists:
+			return domain.ErrAuthAlreadyExists
+		case codes.PermissionDenied:
+			return domain.ErrPermissionDenied
+		case codes.DeadlineExceeded:
+			return domain.ErrRequestTimeout
+		case codes.Unavailable:
+			return domain.ErrServiceUnavailable
+		case codes.FailedPrecondition, codes.Aborted:
+			return domain.ErrConflict
+		default:
+			return domain.ErrInternal
+		}
+	}
+
+	if isUserNotFoundMessage(err.Error()) {
+		return domain.ErrUserNotFound
+	}
+
+	return domain.ErrInternal
+}
+
+func isUserNotFoundStatus(st *status.Status) bool {
+	return st.Code() == codes.NotFound || isUserNotFoundMessage(st.Message())
+}
+
+func isUserNotFoundMessage(message string) bool {
+	return strings.Contains(strings.ToLower(message), domain.ErrUserNotFound.Error())
+}
+
+func logUsersClientError(operation string, rawErr error, mappedErr error) {
+	if st, ok := status.FromError(rawErr); ok {
+		log.Printf("%s failed: users grpc code=%s message=%q mapped=%v", operation, st.Code(), st.Message(), mappedErr)
+		return
+	}
+
+	log.Printf("%s failed: users raw error=%T: %v mapped=%v", operation, rawErr, rawErr, mappedErr)
 }
 
 func sameRecipient(stored domain.OTPTransaction, input domain.OTPTransaction) bool {

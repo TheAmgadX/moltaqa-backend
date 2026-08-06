@@ -2,7 +2,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY,
 
     username TEXT NOT NULL UNIQUE,
-    phone TEXT UNIQUE NULL,
+    phone_number TEXT UNIQUE NULL,
     email TEXT UNIQUE NULL,
 
     profile_image_url TEXT NULL,

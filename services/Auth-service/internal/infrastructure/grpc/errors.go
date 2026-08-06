@@ -20,6 +20,7 @@ func mapServiceError(err error) error {
 
 	switch {
 	case errors.Is(err, domain.ErrOTPTransactionNotFound),
+		errors.Is(err, domain.ErrUserNotFound),
 		errors.Is(err, domain.ErrRefreshTokenNotFound):
 		return status.Error(codes.NotFound, err.Error())
 

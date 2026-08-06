@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"time"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 	"google.golang.org/protobuf/proto"
@@ -22,6 +23,9 @@ func (p *Producer) Produce(ctx context.Context, topic Topic, key string, event p
 	if err != nil {
 		return err
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
 
 	record := &kgo.Record{
 		Topic: string(topic),

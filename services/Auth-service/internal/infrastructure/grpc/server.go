@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"log"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
 	pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
@@ -40,11 +41,13 @@ func (s *AuthGRPCServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.L
 func (s *AuthGRPCServer) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*pb.VerifyOTPResponse, error) {
 	otpTx, err := mapVerifyOTPRequestToDomain(req)
 	if err != nil {
+		log.Printf("mapVerifyOTPRequestToDomain: %v", err)
 		return nil, mapServiceError(err)
 	}
 
 	accessToken, refreshToken, err := s.service.VerifyOTP(ctx, otpTx)
 	if err != nil {
+		log.Printf("VerifyOTP service error: %T: %v", err, err)
 		return nil, mapServiceError(err)
 	}
 

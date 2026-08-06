@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/api-gateway/internal/middlewares"
+	authpb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
 	users "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 	grpc_utils "github.com/TheAmgadX/moltaqa-backend/shared/utils/grpc"
 	"github.com/go-chi/chi/v5"
@@ -11,22 +12,63 @@ import (
 
 type UserHandler struct {
 	userClient users.UsersServiceClient
-	// authClient pb.AuthServiceClient
+	authClient authpb.AuthServiceClient
 	// assetClient pb.AssetServiceClient
 }
 
-func NewUserHandler(userClient users.UsersServiceClient) *UserHandler {
+func NewUserHandler(userClient users.UsersServiceClient, authClient authpb.AuthServiceClient) *UserHandler {
 	return &UserHandler{
 		userClient: userClient,
+		authClient: authClient,
 	}
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	// implement it with auth service.
+	var req authpb.LoginRequest
+	if err := decodeProtoJSON(r.Body, &req); err != nil {
+		respondJSONError(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.authClient.Login(r.Context(), &req)
+	if err != nil {
+		respondJSONError(w, grpc_utils.GetGRPCErrorMessage(err), grpc_utils.MapGRPCErrCodesToHttpErrCodes(err))
+		return
+	}
+
+	respondJSON(w, resp)
 }
 
 func (h *UserHandler) VerifyOTP(w http.ResponseWriter, r *http.Request) {
-	// implement it with auth service.
+	var req authpb.VerifyOTPRequest
+	if err := decodeProtoJSON(r.Body, &req); err != nil {
+		respondJSONError(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.authClient.VerifyOTP(r.Context(), &req)
+	if err != nil {
+		respondJSONError(w, grpc_utils.GetGRPCErrorMessage(err), grpc_utils.MapGRPCErrCodesToHttpErrCodes(err))
+		return
+	}
+
+	respondJSON(w, resp)
+}
+
+func (h *UserHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	var req authpb.RefreshTokenRequest
+	if err := decodeProtoJSON(r.Body, &req); err != nil {
+		respondJSONError(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := h.authClient.RefreshToken(r.Context(), &req)
+	if err != nil {
+		respondJSONError(w, grpc_utils.GetGRPCErrorMessage(err), grpc_utils.MapGRPCErrCodesToHttpErrCodes(err))
+		return
+	}
+
+	respondJSON(w, resp)
 }
 
 // GetUser retrieves a user by id or username or email or phone.
@@ -112,9 +154,13 @@ func (h *UserHandler) DeleteUserAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	req := &users.DeleteUserRequest{Id: callerID}
+	var req authpb.DeleteAccountRequest
+	if err := decodeProtoJSON(r.Body, &req); err != nil {
+		respondJSONError(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
 
-	resp, err := h.userClient.DeleteUser(r.Context(), req)
+	resp, err := h.authClient.DeleteAccount(r.Context(), &req)
 	if err != nil {
 		respondJSONError(w, grpc_utils.GetGRPCErrorMessage(err), grpc_utils.MapGRPCErrCodesToHttpErrCodes(err))
 		return
@@ -131,9 +177,13 @@ func (h *UserHandler) Restore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	req := &users.RestoreUserRequest{Id: callerID}
+	var req authpb.RestoreAccountRequest
+	if err := decodeProtoJSON(r.Body, &req); err != nil {
+		respondJSONError(w, "invalid JSON payload", http.StatusBadRequest)
+		return
+	}
 
-	resp, err := h.userClient.RestoreUser(r.Context(), req)
+	resp, err := h.authClient.RestoreAccount(r.Context(), &req)
 	if err != nil {
 		respondJSONError(w, grpc_utils.GetGRPCErrorMessage(err), grpc_utils.MapGRPCErrCodesToHttpErrCodes(err))
 		return
