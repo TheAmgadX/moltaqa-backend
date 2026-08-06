@@ -1154,10 +1154,11 @@ func (*GetUserRequest_Email) isGetUserRequest_Lookup() {}
 func (*GetUserRequest_Phone) isGetUserRequest_Lookup() {}
 
 type GetUserResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	User            *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
+	PrivacySettings *PrivacySettings       `protobuf:"bytes,2,opt,name=privacy_settings,json=privacySettings,proto3" json:"privacy_settings,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetUserResponse) Reset() {
@@ -1193,6 +1194,13 @@ func (*GetUserResponse) Descriptor() ([]byte, []int) {
 func (x *GetUserResponse) GetUser() *User {
 	if x != nil {
 		return x.User
+	}
+	return nil
+}
+
+func (x *GetUserResponse) GetPrivacySettings() *PrivacySettings {
+	if x != nil {
+		return x.PrivacySettings
 	}
 	return nil
 }
@@ -2181,9 +2189,10 @@ const file_users_v1_users_proto_rawDesc = "" +
 	"\busername\x18\x02 \x01(\tH\x00R\busername\x12\x16\n" +
 	"\x05email\x18\x03 \x01(\tH\x00R\x05email\x12\x16\n" +
 	"\x05phone\x18\x04 \x01(\tH\x00R\x05phoneB\b\n" +
-	"\x06lookup\"5\n" +
+	"\x06lookup\"{\n" +
 	"\x0fGetUserResponse\x12\"\n" +
-	"\x04user\x18\x01 \x01(\v2\x0e.users.v1.UserR\x04user\",\n" +
+	"\x04user\x18\x01 \x01(\v2\x0e.users.v1.UserR\x04user\x12D\n" +
+	"\x10privacy_settings\x18\x02 \x01(\v2\x19.users.v1.PrivacySettingsR\x0fprivacySettings\",\n" +
 	"\x0fGetUsersRequest\x12\x19\n" +
 	"\buser_ids\x18\x01 \x03(\tR\auserIds\"8\n" +
 	"\x10GetUsersResponse\x12$\n" +
@@ -2338,50 +2347,51 @@ var file_users_v1_users_proto_depIdxs = []int32{
 	1,  // 10: users.v1.UpdateUserRequest.account_badge:type_name -> users.v1.AccountBadge
 	34, // 11: users.v1.UpdateUserRequest.birth_date:type_name -> google.protobuf.Timestamp
 	2,  // 12: users.v1.GetUserResponse.user:type_name -> users.v1.User
-	2,  // 13: users.v1.GetUsersResponse.users:type_name -> users.v1.User
-	3,  // 14: users.v1.GetUserSummaryResponse.user:type_name -> users.v1.UserSummary
-	3,  // 15: users.v1.GetUsersSummaryResponse.users:type_name -> users.v1.UserSummary
-	3,  // 16: users.v1.SearchUsersResponse.users:type_name -> users.v1.UserSummary
-	26, // 17: users.v1.UserExistsResponse.response:type_name -> users.v1.UserExistence
-	26, // 18: users.v1.UsersExistResponse.users:type_name -> users.v1.UserExistence
-	4,  // 19: users.v1.GetPrivacySettingsResponse.settings:type_name -> users.v1.PrivacySettings
-	0,  // 20: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> users.v1.Visibility
-	0,  // 21: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> users.v1.Visibility
-	0,  // 22: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> users.v1.Visibility
-	0,  // 23: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> users.v1.Visibility
-	5,  // 24: users.v1.UsersService.CreateUser:input_type -> users.v1.CreateUserRequest
-	7,  // 25: users.v1.UsersService.RegisterContact:input_type -> users.v1.RegisterContactRequest
-	9,  // 26: users.v1.UsersService.UpdateUser:input_type -> users.v1.UpdateUserRequest
-	11, // 27: users.v1.UsersService.DeleteUser:input_type -> users.v1.DeleteUserRequest
-	13, // 28: users.v1.UsersService.RestoreUser:input_type -> users.v1.RestoreUserRequest
-	15, // 29: users.v1.UsersService.GetUser:input_type -> users.v1.GetUserRequest
-	17, // 30: users.v1.UsersService.GetUsers:input_type -> users.v1.GetUsersRequest
-	19, // 31: users.v1.UsersService.GetUserSummary:input_type -> users.v1.GetUserSummaryRequest
-	21, // 32: users.v1.UsersService.GetUsersSummary:input_type -> users.v1.GetUsersSummaryRequest
-	23, // 33: users.v1.UsersService.SearchUsers:input_type -> users.v1.SearchUsersRequest
-	25, // 34: users.v1.UsersService.UserExists:input_type -> users.v1.UserExistsRequest
-	28, // 35: users.v1.UsersService.UsersExist:input_type -> users.v1.UsersExistRequest
-	30, // 36: users.v1.UsersService.GetPrivacySettings:input_type -> users.v1.GetPrivacySettingsRequest
-	32, // 37: users.v1.UsersService.UpdatePrivacySettings:input_type -> users.v1.UpdatePrivacySettingsRequest
-	6,  // 38: users.v1.UsersService.CreateUser:output_type -> users.v1.CreateUserResponse
-	8,  // 39: users.v1.UsersService.RegisterContact:output_type -> users.v1.RegisterContactResponse
-	10, // 40: users.v1.UsersService.UpdateUser:output_type -> users.v1.UpdateUserResponse
-	12, // 41: users.v1.UsersService.DeleteUser:output_type -> users.v1.DeleteUserResponse
-	14, // 42: users.v1.UsersService.RestoreUser:output_type -> users.v1.RestoreUserResponse
-	16, // 43: users.v1.UsersService.GetUser:output_type -> users.v1.GetUserResponse
-	18, // 44: users.v1.UsersService.GetUsers:output_type -> users.v1.GetUsersResponse
-	20, // 45: users.v1.UsersService.GetUserSummary:output_type -> users.v1.GetUserSummaryResponse
-	22, // 46: users.v1.UsersService.GetUsersSummary:output_type -> users.v1.GetUsersSummaryResponse
-	24, // 47: users.v1.UsersService.SearchUsers:output_type -> users.v1.SearchUsersResponse
-	27, // 48: users.v1.UsersService.UserExists:output_type -> users.v1.UserExistsResponse
-	29, // 49: users.v1.UsersService.UsersExist:output_type -> users.v1.UsersExistResponse
-	31, // 50: users.v1.UsersService.GetPrivacySettings:output_type -> users.v1.GetPrivacySettingsResponse
-	33, // 51: users.v1.UsersService.UpdatePrivacySettings:output_type -> users.v1.UpdatePrivacySettingsResponse
-	38, // [38:52] is the sub-list for method output_type
-	24, // [24:38] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	4,  // 13: users.v1.GetUserResponse.privacy_settings:type_name -> users.v1.PrivacySettings
+	2,  // 14: users.v1.GetUsersResponse.users:type_name -> users.v1.User
+	3,  // 15: users.v1.GetUserSummaryResponse.user:type_name -> users.v1.UserSummary
+	3,  // 16: users.v1.GetUsersSummaryResponse.users:type_name -> users.v1.UserSummary
+	3,  // 17: users.v1.SearchUsersResponse.users:type_name -> users.v1.UserSummary
+	26, // 18: users.v1.UserExistsResponse.response:type_name -> users.v1.UserExistence
+	26, // 19: users.v1.UsersExistResponse.users:type_name -> users.v1.UserExistence
+	4,  // 20: users.v1.GetPrivacySettingsResponse.settings:type_name -> users.v1.PrivacySettings
+	0,  // 21: users.v1.UpdatePrivacySettingsRequest.avatar_visibility:type_name -> users.v1.Visibility
+	0,  // 22: users.v1.UpdatePrivacySettingsRequest.phone_visibility:type_name -> users.v1.Visibility
+	0,  // 23: users.v1.UpdatePrivacySettingsRequest.email_visibility:type_name -> users.v1.Visibility
+	0,  // 24: users.v1.UpdatePrivacySettingsRequest.last_seen_visibility:type_name -> users.v1.Visibility
+	5,  // 25: users.v1.UsersService.CreateUser:input_type -> users.v1.CreateUserRequest
+	7,  // 26: users.v1.UsersService.RegisterContact:input_type -> users.v1.RegisterContactRequest
+	9,  // 27: users.v1.UsersService.UpdateUser:input_type -> users.v1.UpdateUserRequest
+	11, // 28: users.v1.UsersService.DeleteUser:input_type -> users.v1.DeleteUserRequest
+	13, // 29: users.v1.UsersService.RestoreUser:input_type -> users.v1.RestoreUserRequest
+	15, // 30: users.v1.UsersService.GetUser:input_type -> users.v1.GetUserRequest
+	17, // 31: users.v1.UsersService.GetUsers:input_type -> users.v1.GetUsersRequest
+	19, // 32: users.v1.UsersService.GetUserSummary:input_type -> users.v1.GetUserSummaryRequest
+	21, // 33: users.v1.UsersService.GetUsersSummary:input_type -> users.v1.GetUsersSummaryRequest
+	23, // 34: users.v1.UsersService.SearchUsers:input_type -> users.v1.SearchUsersRequest
+	25, // 35: users.v1.UsersService.UserExists:input_type -> users.v1.UserExistsRequest
+	28, // 36: users.v1.UsersService.UsersExist:input_type -> users.v1.UsersExistRequest
+	30, // 37: users.v1.UsersService.GetPrivacySettings:input_type -> users.v1.GetPrivacySettingsRequest
+	32, // 38: users.v1.UsersService.UpdatePrivacySettings:input_type -> users.v1.UpdatePrivacySettingsRequest
+	6,  // 39: users.v1.UsersService.CreateUser:output_type -> users.v1.CreateUserResponse
+	8,  // 40: users.v1.UsersService.RegisterContact:output_type -> users.v1.RegisterContactResponse
+	10, // 41: users.v1.UsersService.UpdateUser:output_type -> users.v1.UpdateUserResponse
+	12, // 42: users.v1.UsersService.DeleteUser:output_type -> users.v1.DeleteUserResponse
+	14, // 43: users.v1.UsersService.RestoreUser:output_type -> users.v1.RestoreUserResponse
+	16, // 44: users.v1.UsersService.GetUser:output_type -> users.v1.GetUserResponse
+	18, // 45: users.v1.UsersService.GetUsers:output_type -> users.v1.GetUsersResponse
+	20, // 46: users.v1.UsersService.GetUserSummary:output_type -> users.v1.GetUserSummaryResponse
+	22, // 47: users.v1.UsersService.GetUsersSummary:output_type -> users.v1.GetUsersSummaryResponse
+	24, // 48: users.v1.UsersService.SearchUsers:output_type -> users.v1.SearchUsersResponse
+	27, // 49: users.v1.UsersService.UserExists:output_type -> users.v1.UserExistsResponse
+	29, // 50: users.v1.UsersService.UsersExist:output_type -> users.v1.UsersExistResponse
+	31, // 51: users.v1.UsersService.GetPrivacySettings:output_type -> users.v1.GetPrivacySettingsResponse
+	33, // 52: users.v1.UsersService.UpdatePrivacySettings:output_type -> users.v1.UpdatePrivacySettingsResponse
+	39, // [39:53] is the sub-list for method output_type
+	25, // [25:39] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_users_v1_users_proto_init() }

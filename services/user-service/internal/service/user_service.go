@@ -132,18 +132,24 @@ func (s *UserService) Restore(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *UserService) Get(ctx context.Context, lookup domain.Lookup) (*domain.User, error) {
+func (s *UserService) Get(ctx context.Context, lookup domain.Lookup) (*domain.User, *domain.PrivacySettings, error) {
 	if err := lookupValidation(lookup); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	user, err := s.repo.Get(ctx, lookup)
 
 	if err != nil {
-		return nil, domain.MapPostgresErrorToDomain(err)
+		return nil, nil, domain.MapPostgresErrorToDomain(err)
 	}
 
-	return user, nil
+	privacy_settings, err := s.repo.GetPrivacySettings(ctx, user.Id.String())
+
+	if err != nil {
+		return nil, nil, domain.MapPostgresErrorToDomain(err)
+	}
+
+	return user, privacy_settings, nil
 }
 
 func (s *UserService) GetUsers(ctx context.Context, userIds []string) ([]domain.User, error) {

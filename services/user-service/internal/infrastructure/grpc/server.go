@@ -87,14 +87,15 @@ func (s *UserGRPCServer) GetUser(ctx context.Context, req *pb.GetUserRequest) (*
 		return nil, mapServiceError(err)
 	}
 
-	user, err := s.service.Get(ctx, lookup)
+	user, privacy_settings, err := s.service.Get(ctx, lookup)
 
 	if err != nil {
 		return nil, mapServiceError(err)
 	}
 
 	return &pb.GetUserResponse{
-		User: mapUserToProto(user),
+		User:            mapUserToProto(user),
+		PrivacySettings: mapPrivacySettingsToProto(privacy_settings),
 	}, nil
 }
 

@@ -10,28 +10,103 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/shared/middlewares"
+	"github.com/TheAmgadX/moltaqa-backend/services/api-gateway/internal/handlers"
+	"github.com/TheAmgadX/moltaqa-backend/services/api-gateway/internal/middlewares"
+	"github.com/TheAmgadX/moltaqa-backend/shared/env"
+	shared_middlewares "github.com/TheAmgadX/moltaqa-backend/shared/middlewares"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	users "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 )
 
 func addMiddlewares(router *chi.Mux) {
 	router.Use(middleware.Logger)
-	router.Use(middlewares.CORSMiddleware)
+	router.Use(shared_middlewares.CORSMiddleware)
 }
 
-func defineRoutes(router *chi.Mux) {
-	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
+func defineUsersRoutes(router *chi.Mux, handler *handlers.UserHandler) {
+	// Global Middleware
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.SetHeader("Content-Type", "application/json"))
+
+	router.Route("/api/v1", func(r chi.Router) {
+
+		// -------------------------------------------------------------
+		// 1. AUTHENTICATION & ACCOUNT LIFECYCLE ROUTES
+		// -------------------------------------------------------------
+		r.Route("/auth", func(r chi.Router) {
+			// Flow: User Creation / Login (POST /auth/login)
+			r.Post("/login", handler.Login)
+
+			// Flow: Verify OTP for Login, Register, Restore, or Delete
+			r.Post("/verify-otp", handler.VerifyOTP)
+		})
+
+		// -------------------------------------------------------------
+		// 2. USER PROFILE & PRIVACY ROUTES
+		// -------------------------------------------------------------
+		r.Route("/users", func(r chi.Router) {
+
+			// Protected Routes (Require Auth Middleware)
+			r.Group(func(r chi.Router) {
+				r.Use(middlewares.Authentication)
+
+				// Flow: Register Contact
+				r.Post("/contacts", handler.RegisterContact)
+
+				// Flow: Update User Profile (Username, Display Name, Bio, etc.)
+				r.Patch("/", handler.UpdateUserProfile)
+
+				// Flow: Request User Account Deletion
+				r.Delete("/", handler.DeleteUserAccount)
+
+				// Flow: Profile Image Upload
+				r.Post("/avatar", handler.UploadProfileImage)
+
+				// Flow: Request Account Restoration
+				r.Post("/restore", handler.Restore)
+
+				// Privacy Settings Routes
+				r.Route("/privacy-settings", func(r chi.Router) {
+					r.Get("/", handler.GetPrivacySettings)
+
+					// Flow: Update Privacy Settings (Search, Profile, Chat)
+					r.Patch("/", handler.UpdatePrivacySettings)
+				})
+			})
+
+			// Flow: Get User
+			r.Get("/", handler.GetUser)
+
+			// Flow: Check if User Exists
+			r.Get("/exists", handler.UserExists)
+
+			// Flow: Search For users
+			r.Post("/search", handler.SearchUsers)
+
+			// Flow: Get User Summary
+			r.Get("/{id}/summary", handler.GetUserSummary)
+
+			// Flow: Get Users Summaries
+			r.Post("/summaries", handler.GetUsersSummary)
+		})
 	})
 }
 
-func createServer() *http.Server {
+func createServer(grpcConn *grpc.ClientConn) *http.Server {
 	router := chi.NewRouter()
 
 	addMiddlewares(router)
 
-	defineRoutes(router)
+	usersClient := users.NewUsersServiceClient(grpcConn)
+
+	usersHandler := handlers.NewUserHandler(usersClient)
+
+	defineUsersRoutes(router, usersHandler)
 
 	return &http.Server{
 		Addr:    ":8080",
@@ -92,10 +167,27 @@ func runServer(server *http.Server, shutdownTimeout time.Duration, ctx context.C
 	return gracefulShutdown(server, shutdownTimeout)
 }
 
+func createGRPCConnection(serviceUrl string) (*grpc.ClientConn, error) {
+	grpcConn, err := grpc.NewClient(serviceUrl,
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err != nil {
+		return nil, err
+	}
+	return grpcConn, nil
+}
+
 func main() {
 	log.Println("Start api-gateway service...")
 
-	server := createServer()
+	userService := env.GetString("USER_SERVICE_URL", "localhost")
+	userGrpcConn, err := createGRPCConnection(userService)
+	if err != nil {
+		log.Fatalf("failed to connect to grpc server: %v", err)
+	}
+	defer userGrpcConn.Close()
+
+	server := createServer(userGrpcConn)
 
 	if err := runServer(server, 10*time.Second, context.Background()); err != nil {
 		log.Printf("Failed while running the server: %v", err)

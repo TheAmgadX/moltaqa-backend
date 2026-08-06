@@ -465,7 +465,7 @@ func TestUserService_Get(t *testing.T) {
 		ctx, cancel := testContext()
 		defer cancel()
 
-		got, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "lookup@example.com"})
+		got, _, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "lookup@example.com"})
 		if err != nil {
 			t.Fatalf("Get() unexpected error: %v", err)
 		}
@@ -480,7 +480,7 @@ func TestUserService_Get(t *testing.T) {
 		ctx, cancel := testContext()
 		defer cancel()
 
-		got, err := svc.Get(ctx, domain.Lookup{Type: domain.LookUpId, Value: "some-id"})
+		got, _, err := svc.Get(ctx, domain.Lookup{Type: domain.LookUpId, Value: "some-id"})
 		if err != nil {
 			t.Fatalf("Get() by id unexpected error: %v", err)
 		}
@@ -494,7 +494,7 @@ func TestUserService_Get(t *testing.T) {
 		ctx, cancel := testContext()
 		defer cancel()
 
-		_, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "not-an-email"})
+		_, _, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "not-an-email"})
 		if err == nil {
 			t.Fatal("expected Get() to reject an invalid email lookup")
 		}
@@ -506,7 +506,7 @@ func TestUserService_Get(t *testing.T) {
 		ctx, cancel := testContext()
 		defer cancel()
 
-		_, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "a@b.com"})
+		_, _, err := svc.Get(ctx, domain.Lookup{Type: domain.LookupEmail, Value: "a@b.com"})
 		if err == nil {
 			t.Fatal("expected Get() to propagate repo error")
 		}

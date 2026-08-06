@@ -188,6 +188,7 @@ message GetUserRequest {
 
 message GetUserResponse {
   User user = 1;
+  PrivacySettings privacy_settings = 2;
 }
 
 message GetUsersRequest {
