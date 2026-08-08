@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/repository"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/infrastructure/repository"
 	userspb "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 	"google.golang.org/grpc"
 )

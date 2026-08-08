@@ -9,9 +9,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
 COPY shared ./shared
-COPY services/Auth-service ./services/Auth-service
+COPY services/auth-service ./services/auth-service
 
-WORKDIR /app/services/Auth-service
+WORKDIR /app/services/auth-service
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-w -s" -o auth-service ./cmd
@@ -22,7 +22,7 @@ RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 
-COPY --from=builder /app/services/Auth-service/auth-service .
+COPY --from=builder /app/services/auth-service/auth-service .
 
 RUN adduser -D appuser
 USER appuser

@@ -6,6 +6,7 @@ secrets.yml
 build/
 
 services/user-service/deployments/k8s/postgres_secrets.yml
+services/Auth-service/deployments/k8s/postgres_secrets.yml
 services/email-service/deployments/k8s/smtp-secret.yml
 
 # test artifacts

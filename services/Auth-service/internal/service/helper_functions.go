@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	userspb "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

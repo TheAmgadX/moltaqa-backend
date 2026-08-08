@@ -3,7 +3,7 @@ package service
 import (
 	"regexp"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	"github.com/go-playground/validator/v10"
 	"github.com/nyaruka/phonenumbers"
 )

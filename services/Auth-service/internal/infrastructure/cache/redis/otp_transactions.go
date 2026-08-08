@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	goredis "github.com/redis/go-redis/v9"
 )
 

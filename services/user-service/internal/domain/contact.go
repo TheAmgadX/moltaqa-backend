@@ -25,18 +25,9 @@ func (c ContactRequest) TypeString() string {
 	case ContactLookupTypeEmail:
 		return "email"
 	case ContactLookupTypePhone:
-		return "phone"
-	default:
-		return ""
-	}
-}
-
-func (c ContactRequest) ColumnName() string {
-	switch c.ContactLookup.Type {
-	case ContactLookupTypePhone:
 		return "phone_number"
 	default:
-		return c.TypeString()
+		return ""
 	}
 }
 

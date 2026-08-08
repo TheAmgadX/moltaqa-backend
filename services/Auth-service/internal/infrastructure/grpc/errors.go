@@ -3,7 +3,7 @@ package grpc
 import (
 	"errors"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

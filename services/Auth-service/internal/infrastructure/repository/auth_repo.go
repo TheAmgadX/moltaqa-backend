@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 )
 
 // AuthRepository defines the persistence layer for auth-related data.

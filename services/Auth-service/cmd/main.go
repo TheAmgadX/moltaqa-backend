@@ -10,12 +10,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/auth"
-	cache_redis "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/cache/redis"
-	Auth_events "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/events"
-	Auth_grpc "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/grpc"
-	repository "github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/infrastructure/repository/postgres"
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/service"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/auth"
+	cache_redis "github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/infrastructure/cache/redis"
+	auth_events "github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/infrastructure/events"
+	auth_grpc "github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/infrastructure/grpc"
+	repository "github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/infrastructure/repository/postgres"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/service"
 	"github.com/TheAmgadX/moltaqa-backend/shared/env"
 	"github.com/TheAmgadX/moltaqa-backend/shared/kafka"
 	pb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
@@ -127,7 +127,7 @@ func createServer(port string) (*grpc.Server, *net.Listener, func(), error) {
 	}
 
 	otpStore := cache_redis.NewOTPTransactionStore(redisClient, "")
-	publisher := Auth_events.NewPublisher(kafka.NewProducer(kafkaClient))
+	publisher := auth_events.NewPublisher(kafka.NewProducer(kafkaClient))
 	signer := auth.NewJWTSigner()
 
 	service, err := service.NewService(repo, otpStore, publisher, signer, usersClient)
@@ -139,7 +139,7 @@ func createServer(port string) (*grpc.Server, *net.Listener, func(), error) {
 		return nil, nil, nil, err
 	}
 
-	pb.RegisterAuthServiceServer(grpc_server, Auth_grpc.NewAuthGRPCServer(service))
+	pb.RegisterAuthServiceServer(grpc_server, auth_grpc.NewAuthGRPCServer(service))
 
 	healthServer := health.NewServer()
 	grpc_health_v1.RegisterHealthServer(grpc_server, healthServer)

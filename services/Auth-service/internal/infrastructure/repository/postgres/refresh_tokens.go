@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	utils_postgres "github.com/TheAmgadX/moltaqa-backend/shared/utils/postgres"
 	"github.com/jackc/pgx/v5"
 )

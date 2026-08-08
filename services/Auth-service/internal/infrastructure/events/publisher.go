@@ -3,7 +3,7 @@ package events
 import (
 	"context"
 
-	"github.com/TheAmgadX/moltaqa-backend/services/Auth-service/internal/domain"
+	"github.com/TheAmgadX/moltaqa-backend/services/auth-service/internal/domain"
 	"github.com/TheAmgadX/moltaqa-backend/shared/kafka"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"

@@ -119,7 +119,7 @@ func (r *UserPostgresRepository) RegisterContact(ctx context.Context, contact *d
 		SET
 			%s = $1
 		WHERE id = $2
-	`, contact.ColumnName())
+	`, contact.TypeString())
 
 	if contact.UserId == "" {
 		return utils_postgres.ErrInvalidInput
@@ -306,7 +306,7 @@ func (r *UserPostgresRepository) Get(ctx context.Context, lookup domain.Lookup) 
 	query := fmt.Sprintf(`
 		SELECT * FROM users
 		WHERE %s = $1
-	`, lookup.ColumnName())
+	`, lookup.TypeString())
 
 	rows, err := r.db.Query(ctx, query, lookup.Value)
 
@@ -525,7 +525,7 @@ func (r *UserPostgresRepository) Exists(ctx context.Context, lookup domain.Looku
 	query := `
 		SELECT id
 		FROM users
-		WHERE ` + lookup.ColumnName() + ` = $1
+		WHERE ` + lookup.TypeString() + ` = $1
 	`
 
 	rows, err := r.db.Query(ctx, query, lookup.Value)

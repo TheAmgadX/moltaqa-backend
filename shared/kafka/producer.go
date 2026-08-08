@@ -24,6 +24,7 @@ func (p *Producer) Produce(ctx context.Context, topic Topic, key string, event p
 		return err
 	}
 
+	// TODO: handle the case of time out. the event must not be dropped.
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
