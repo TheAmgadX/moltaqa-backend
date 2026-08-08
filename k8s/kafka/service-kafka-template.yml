@@ -12,8 +12,8 @@ env:
   - name: KAFKA_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: kafka-services
+        name: kafka-admin
         key: password
 
   - name: KAFKA_USERNAME
-    value: service-name
+    value: kafka-admin

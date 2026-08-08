@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "shared/proto/auth;auth";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+
+  rpc VerifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse);
+
+  rpc RestoreAccount(RestoreAccountRequest) returns (RestoreAccountResponse);
+
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+message LoginRequest {
+  oneof recipient {
+    string phone = 1;
+    string email = 2;
+  }
+}
+
+message LoginResponse {}
+
+message VerifyOTPRequest {
+  oneof recipient {
+    string phone = 1;
+    string email = 2;
+  }
+  string otp = 3;
+}
+
+message VerifyOTPResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RestoreAccountRequest {
+  oneof recipient {
+    string phone = 1;
+    string email = 2;
+  }
+}
+
+message RestoreAccountResponse {}
+
+message DeleteAccountRequest {
+  oneof recipient {
+    string phone = 1;
+    string email = 2;
+  }
+}
+
+message DeleteAccountResponse {}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}

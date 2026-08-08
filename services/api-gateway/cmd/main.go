@@ -19,6 +19,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	authpb "github.com/TheAmgadX/moltaqa-backend/shared/proto/auth"
 	users "github.com/TheAmgadX/moltaqa-backend/shared/proto/users"
 )
 
@@ -44,6 +45,9 @@ func defineUsersRoutes(router *chi.Mux, handler *handlers.UserHandler) {
 
 			// Flow: Verify OTP for Login, Register, Restore, or Delete
 			r.Post("/verify-otp", handler.VerifyOTP)
+
+			// Flow: Refresh Access Token
+			r.Post("/refresh", handler.RefreshToken)
 		})
 
 		// -------------------------------------------------------------
@@ -97,14 +101,15 @@ func defineUsersRoutes(router *chi.Mux, handler *handlers.UserHandler) {
 	})
 }
 
-func createServer(grpcConn *grpc.ClientConn) *http.Server {
+func createServer(userGrpcConn *grpc.ClientConn, authGrpcConn *grpc.ClientConn) *http.Server {
 	router := chi.NewRouter()
 
 	addMiddlewares(router)
 
-	usersClient := users.NewUsersServiceClient(grpcConn)
+	usersClient := users.NewUsersServiceClient(userGrpcConn)
+	authClient := authpb.NewAuthServiceClient(authGrpcConn)
 
-	usersHandler := handlers.NewUserHandler(usersClient)
+	usersHandler := handlers.NewUserHandler(usersClient, authClient)
 
 	defineUsersRoutes(router, usersHandler)
 
@@ -183,11 +188,18 @@ func main() {
 	userService := env.GetString("USER_SERVICE_URL", "localhost")
 	userGrpcConn, err := createGRPCConnection(userService)
 	if err != nil {
-		log.Fatalf("failed to connect to grpc server: %v", err)
+		log.Fatalf("failed to connect to user grpc server: %v", err)
 	}
 	defer userGrpcConn.Close()
 
-	server := createServer(userGrpcConn)
+	authService := env.GetString("AUTH_SERVICE_URL", "localhost")
+	authGrpcConn, err := createGRPCConnection(authService)
+	if err != nil {
+		log.Fatalf("failed to connect to auth grpc server: %v", err)
+	}
+	defer authGrpcConn.Close()
+
+	server := createServer(userGrpcConn, authGrpcConn)
 
 	if err := runServer(server, 10*time.Second, context.Background()); err != nil {
 		log.Printf("Failed while running the server: %v", err)

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/domain"
 	"github.com/TheAmgadX/moltaqa-backend/services/user-service/internal/infrastructure/repository"
@@ -49,7 +50,9 @@ func (s *UserService) Create(ctx context.Context, user *domain.User) error {
 	err := s.repo.Create(ctx, user)
 
 	if err != nil {
-		return domain.MapPostgresErrorToDomain(err)
+		mappedErr := domain.MapPostgresErrorToDomain(err)
+		log.Printf("Create user repo failed: raw=%T: %v mapped=%v email=%q phone=%q", err, err, mappedErr, user.Email, user.PhoneNumber)
+		return mappedErr
 	}
 
 	event := &events.UserRegistered{

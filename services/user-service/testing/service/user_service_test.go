@@ -304,6 +304,23 @@ func TestUserService_RegisterContact(t *testing.T) {
 		}
 	})
 
+	t.Run("error — invalid phone contact", func(t *testing.T) {
+		svc := mustNewService(t, &fakeRepo{})
+		ctx, cancel := testContext()
+		defer cancel()
+
+		contact := &domain.ContactRequest{
+			UserId: "user-123",
+			ContactLookup: domain.ContactLookup{
+				Type:  domain.ContactLookupTypePhone,
+				Value: "12345",
+			},
+		}
+		if err := svc.RegisterContact(ctx, contact); err == nil {
+			t.Fatal("expected RegisterContact() to reject an invalid phone")
+		}
+	})
+
 	t.Run("error — repo failure propagated", func(t *testing.T) {
 		repo := &fakeRepo{contactErr: errors.New("db error")}
 		svc := mustNewService(t, repo)

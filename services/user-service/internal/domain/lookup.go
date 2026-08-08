@@ -23,7 +23,7 @@ func (l Lookup) TypeString() string {
 	case LookupEmail:
 		return "email"
 	case LookupPhone:
-		return "phone"
+		return "phone_number"
 	default:
 		return ""
 	}

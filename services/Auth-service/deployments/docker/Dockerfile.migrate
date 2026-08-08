@@ -1,0 +1,5 @@
+FROM migrate/migrate:v4.16.2
+
+COPY services/auth-service/migrations /migrations
+
+ENTRYPOINT ["migrate", "-path", "/migrations"]

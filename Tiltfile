@@ -6,6 +6,7 @@ k8s_yaml("k8s/secrets.yml")
 k8s_yaml("k8s/kafka/kafka-nodepool.yml")
 k8s_yaml("k8s/kafka/kafka.yml")
 k8s_yaml("k8s/kafka/kafka-admin-user.yml")
+k8s_yaml("k8s/kafka/kafka-service-user.yml")
 k8s_yaml("k8s/kafka/config.yml")
 k8s_yaml("k8s/kafka/kafka-ui.yml")
 
@@ -63,3 +64,52 @@ docker_build(
 )
 
 k8s_resource("kafka-bootstrap", labels=["Jobs"])
+
+# ---------- auth-service & database ----------
+k8s_yaml("services/auth-service/deployments/k8s/postgres_secrets.yml")
+k8s_yaml("services/auth-service/deployments/k8s/postgres_service.yml")
+k8s_yaml("services/auth-service/deployments/k8s/postgres_statefulset.yml")
+k8s_yaml("services/auth-service/deployments/k8s/redis.yml")
+
+k8s_resource("postgres-auth-service", labels=["Databases"])
+k8s_resource("redis-auth-service", labels=["Databases"])
+
+# database migrations
+k8s_yaml("services/auth-service/deployments/k8s/migration-job.yml")
+
+docker_build(
+    "auth-db-migration",
+    ".",
+    dockerfile="services/auth-service/deployments/docker/Dockerfile.migrate",
+)
+
+k8s_resource(
+    "auth-db-migration",
+    resource_deps=["postgres-auth-service"],
+    labels=["Jobs"],
+)
+
+k8s_yaml("services/auth-service/deployments/k8s/auth-service.yml")
+docker_build(
+    "auth-service",
+    ".",
+    dockerfile="services/auth-service/deployments/docker/Dockerfile",
+)
+
+k8s_resource(
+    "auth-service",
+    resource_deps=["auth-db-migration", "kafka-bootstrap"],
+    port_forwards='50052:50051',
+    labels=["Services"],
+)
+
+# ---------- email service ----------
+k8s_yaml("services/email-service/deployments/k8s/smtp-secret.yml")
+k8s_yaml("services/email-service/deployments/k8s/email-service.yml")
+docker_build(
+    "email-service",
+    ".",
+    dockerfile="services/email-service/deployments/docker/Dockerfile",
+)
+
+k8s_resource("email-service", resource_deps=["kafka-bootstrap"], labels=["Services"])

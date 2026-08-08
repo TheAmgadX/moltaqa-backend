@@ -48,6 +48,10 @@ func NewClient(cfg *Config) (*kgo.Client, error) {
 			kgo.ConsumerGroup(cfg.GroupID),
 			kgo.AutoCommitMarks(),
 		)
+
+		if len(cfg.Topics) > 0 {
+			opts = append(opts, kgo.ConsumeTopics(cfg.Topics...))
+		}
 	}
 
 	if cfg.Username != "" {

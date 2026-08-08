@@ -22,7 +22,6 @@ const initSchema = `
 CREATE TABLE users (
     id UUID PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
-    phone TEXT UNIQUE NULL,
     phone_number TEXT UNIQUE NULL,
     email TEXT UNIQUE NULL,
     profile_image_url TEXT NULL,
@@ -491,11 +490,11 @@ func TestExists_Found(t *testing.T) {
 	}
 }
 
-func TestExists_NotFound_ReturnsErrUserNotFound(t *testing.T) {
+func TestExists_NotFound_ReturnsErrNotFound(t *testing.T) {
 	repo := newTestRepo(t)
 	_, err := repo.Exists(context.Background(), domain.Lookup{Type: domain.LookUpId, Value: uuid.NewString()})
-	if err != domain.ErrUserNotFound {
-		t.Fatalf("want ErrUserNotFound, got %v", err)
+	if err != utils_postgres.ErrNotFound {
+		t.Fatalf("want ErrNotFound, got %v", err)
 	}
 }
 
@@ -558,6 +557,27 @@ func TestRegisterContact_HappyPath_Email(t *testing.T) {
 		ContactLookup: domain.ContactLookup{
 			Type:  domain.ContactLookupTypeEmail,
 			Value: "test@example.com",
+		},
+	})
+	if err != nil {
+		t.Fatalf("RegisterContact: unexpected error: %v", err)
+	}
+}
+
+func TestRegisterContact_HappyPath_Phone(t *testing.T) {
+	repo := newTestRepo(t)
+	ctx := context.Background()
+
+	u := newUser("contact_phone")
+	if err := repo.Create(ctx, u); err != nil {
+		t.Fatalf("Create: %v", err)
+	}
+
+	err := repo.RegisterContact(ctx, &domain.ContactRequest{
+		UserId: u.Id.String(),
+		ContactLookup: domain.ContactLookup{
+			Type:  domain.ContactLookupTypePhone,
+			Value: "+201234567890",
 		},
 	})
 	if err != nil {

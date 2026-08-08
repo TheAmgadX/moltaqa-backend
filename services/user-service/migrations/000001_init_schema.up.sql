@@ -2,7 +2,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY,
 
     username TEXT NOT NULL UNIQUE,
-    phone TEXT UNIQUE NULL,
+    phone_number TEXT UNIQUE NULL,
     email TEXT UNIQUE NULL,
 
     profile_image_url TEXT NULL,
@@ -32,6 +32,8 @@ CREATE TABLE users (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP NULL
 );
+
+CREATE INDEX idx_users_display_name ON users(display_name);
 
 CREATE TABLE privacy_settings (
     user_id UUID PRIMARY KEY,

@@ -6,6 +6,8 @@ metadata:
   namespace: kafka
 
 data:
-  KAFKA_BROKERS: kafka-kafka-bootstrap:9092
+  # Use the fully-qualified cluster-local DNS name so this ConfigMap can be
+  # consumed by pods in ANY namespace (e.g. default or kafka).
+  KAFKA_BROKERS: kafka-kafka-bootstrap.kafka.svc.cluster.local:9092
   KAFKA_MECHANISM: SCRAM-SHA-512
   KAFKA_TLS_ENABLED: "false"

@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: auth-db-migration
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+        - name: migration
+          image: auth-db-migration:latest
+
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: POSTGRES_PASSWORD
+
+          command: ["/bin/sh", "-c"]
+
+          args:
+            - >
+              migrate
+              -path /migrations
+              -database "postgres://auth_admin:${DB_PASSWORD}@postgres-auth-service:5432/auth_db?sslmode=disable"
+              up

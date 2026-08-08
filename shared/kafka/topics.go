@@ -13,10 +13,17 @@ const (
 	UserUpdated       Topic = "user.updated"
 	UserDeleted       Topic = "user.deleted"
 	UserRestored      Topic = "user.restored"
+
+	// Auth notification topics
+	AuthSendEmail Topic = "auth.send_email"
+	AuthSendSMS   Topic = "auth.send_sms"
 )
 
 func Topics() []string {
-	return []string{UserRegistered.String(), ContactRegistered.String(),
+	return []string{
+		UserRegistered.String(), ContactRegistered.String(),
 		UserUpdated.String(), UserDeleted.String(), UserRestored.String(),
+		AuthSendEmail.String(),
+		AuthSendSMS.String(),
 	}
 }
