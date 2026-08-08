@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: email-service
+  namespace: kafka
+  labels:
+    app: email-service
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: email-service
+
+  template:
+    metadata:
+      labels:
+        app: email-service
+
+    spec:
+      containers:
+        - name: email-service
+          image: email-service
+          imagePullPolicy: Never
+
+          envFrom:
+            - configMapRef:
+                name: kafka-config
+
+          env:
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-admin
+                  key: password
+            - name: KAFKA_USERNAME
+              value: kafka-admin
+
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-smtp
+                  key: SMTP_HOST
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-smtp
+                  key: SMTP_PORT
+            - name: SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-smtp
+                  key: SMTP_USERNAME
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-smtp
+                  key: SMTP_PASSWORD
+            - name: SMTP_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-smtp
+                  key: SMTP_FROM
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

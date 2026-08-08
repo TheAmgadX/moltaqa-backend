@@ -6,6 +6,7 @@ k8s_yaml("k8s/secrets.yml")
 k8s_yaml("k8s/kafka/kafka-nodepool.yml")
 k8s_yaml("k8s/kafka/kafka.yml")
 k8s_yaml("k8s/kafka/kafka-admin-user.yml")
+k8s_yaml("k8s/kafka/kafka-service-user.yml")
 k8s_yaml("k8s/kafka/config.yml")
 k8s_yaml("k8s/kafka/kafka-ui.yml")
 
@@ -101,3 +102,14 @@ k8s_resource(
     port_forwards='50052:50051',
     labels=["Services"],
 )
+
+# ---------- email service ----------
+k8s_yaml("services/email-service/deployments/k8s/smtp-secret.yml")
+k8s_yaml("services/email-service/deployments/k8s/email-service.yml")
+docker_build(
+    "email-service",
+    ".",
+    dockerfile="services/email-service/deployments/docker/Dockerfile",
+)
+
+k8s_resource("email-service", resource_deps=["kafka-bootstrap"], labels=["Services"])

@@ -64,7 +64,18 @@ spec:
 
             # Kafka connection details (SendEmail / SendSMS events)
             - name: KAFKA_BROKERS
-              value: "kafka:9092"
+              value: "kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
+            - name: KAFKA_MECHANISM
+              value: "SCRAM-SHA-512"
+            - name: KAFKA_TLS_ENABLED
+              value: "false"
+            - name: KAFKA_USERNAME
+              value: kafka-admin
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-admin
+                  key: password
 
             # JWT signing key (access tokens)
             - name: JWT_SIGNING_KEY

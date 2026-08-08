@@ -28,6 +28,10 @@ type Config struct {
 	// Consumer group ID for the client.
 	GroupID string
 
+	// Topics is the set of topics a consumer client subscribes to. It is ignored
+	// for producer-only clients.
+	Topics []string
+
 	// Whether to use TLS when connecting to brokers.
 	TLS bool
 }
